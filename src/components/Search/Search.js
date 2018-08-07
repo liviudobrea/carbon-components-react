@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import classNames from 'classnames';
+import { iconSearch, iconCloseSolid } from 'carbon-icons';
 import Icon from '../Icon';
 
 export default class Search extends Component {
@@ -28,7 +29,18 @@ export default class Search extends Component {
 
   state = {
     hasContent: this.props.value || this.props.defaultValue || false,
+    prevValue: this.props.value,
   };
+
+  static getDerivedStateFromProps({ value }, state) {
+    const { prevValue } = state || {};
+    return state && prevValue === value
+      ? null
+      : {
+          hasContent: !!value,
+          prevValue: value,
+        };
+  }
 
   clearInput = evt => {
     if (!this.props.value) {
@@ -89,7 +101,7 @@ export default class Search extends Component {
     return (
       <div className={searchClasses} role="search">
         <Icon
-          name="search"
+          icon={iconSearch}
           description={labelText}
           className="bx--search-magnifier"
         />
@@ -112,7 +124,7 @@ export default class Search extends Component {
           onClick={this.clearInput}
           type="button"
           aria-label={closeButtonLabelText}>
-          <Icon name="close--solid" description={closeButtonLabelText} />
+          <Icon icon={iconCloseSolid} description={closeButtonLabelText} />
         </button>
       </div>
     );
