@@ -22,24 +22,10 @@ describe('childrenOfType', () => {
     // on the number of times this is called to make sure we aren't swallowing
     // any errors unexpectedly.
     spy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    reactHotLoader.disableProxyCreation = true;
   });
 
   afterEach(() => {
     spy.mockRestore();
-    reactHotLoader.reset();
-  });
-
-  it('should validate RHL Proxied children of a given element type', () => {
-    reactHotLoader.disableProxyCreation = false;
-    const ProxiedChildValidTest = ({ children }) => <div>{children}</div>;
-    ProxiedChildValidTest.propTypes = {
-      children: childrenOfType(StatelessComponent),
-    };
-    <ProxiedChildValidTest>
-      <StatelessComponent />
-    </ProxiedChildValidTest>;
-    expect(spy).not.toHaveBeenCalled();
   });
 
   it('should validate RHL Proxied children of a given element type', () => {
@@ -80,8 +66,8 @@ describe('childrenOfType', () => {
     expect(spy).toHaveBeenCalledWith(
       expect.stringContaining(
         'Warning: Failed prop type: Invalid prop `children` of type `div` ' +
-          'supplied to `ChildElementInvalidTest`, expected each child to be a ' +
-          '`span` component.'
+        'supplied to `ChildElementInvalidTest`, expected each child to be a ' +
+        '`span` component.'
       )
     );
   });
@@ -115,8 +101,8 @@ describe('childrenOfType', () => {
     expect(spy).toHaveBeenCalledWith(
       expect.stringContaining(
         'Warning: Failed prop type: Invalid prop `children` of type ' +
-          '`BadStatelessComponent` supplied to `ChildSFCInvalidTest`, expected ' +
-          'each child to be a `StatelessComponent` component.'
+        '`BadStatelessComponent` supplied to `ChildSFCInvalidTest`, expected ' +
+        'each child to be a `StatelessComponent` component.'
       )
     );
   });
@@ -153,8 +139,8 @@ describe('childrenOfType', () => {
     expect(spy).toHaveBeenCalledWith(
       expect.stringContaining(
         'Warning: Failed prop type: Invalid prop `children` of type ' +
-          '`BadClassComponent` supplied to `ChildClassInvalidTest`, expected ' +
-          'each child to be a `ClassComponent` component.'
+        '`BadClassComponent` supplied to `ChildClassInvalidTest`, expected ' +
+        'each child to be a `ClassComponent` component.'
       )
     );
   });
@@ -169,7 +155,7 @@ describe('childrenOfType', () => {
     expect(spy).toHaveBeenCalledWith(
       expect.stringContaining(
         'The prop `children` is marked as required in RequiredTest, but its ' +
-          'value is `undefined`.'
+        'value is `undefined`.'
       )
     );
   });
