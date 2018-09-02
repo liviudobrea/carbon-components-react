@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import React from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Downshift from 'downshift';
 import ListBox, { PropTypes as ListBoxPropTypes } from '../ListBox';
@@ -10,7 +10,7 @@ import { sortingPropTypes } from './MultiSelectV2PropTypes';
 import { defaultItemToString } from './tools/itemToString';
 import { defaultSortItems, defaultCompareItems } from './tools/sorting';
 
-export default class MultiSelectV2 extends React.Component {
+export default class MultiSelectV2 extends PureComponent {
   static propTypes = {
     ...sortingPropTypes,
 
@@ -101,7 +101,11 @@ export default class MultiSelectV2 extends React.Component {
 
   constructor(props) {
     super(props);
+    this.handleOnChange = this.handleOnChange.bind(this);
+    this.handleOnOuterClick = this.handleOnOuterClick.bind(this);
+    this.handleOnStateChange = this.handleOnStateChange.bind(this);
     this.state = {
+      highlightedIndex: null,
       isOpen: props.open,
     };
   }
@@ -112,31 +116,20 @@ export default class MultiSelectV2 extends React.Component {
     }
   };
 
-  handleOnToggleMenu = () => {
-    this.setState(
-      state => ({
-        isOpen: !state.isOpen,
-      }),
-      () => {
-        this.handleOnChange(this.state);
-      }
-    );
-  };
-
   handleOnOuterClick = () => {
-    this.setState(
-      {
-        isOpen: false,
-      },
-      () => {
-        this.handleOnChange(this.state);
-      }
-    );
+    this.setState({ isOpen: false }, () => {
+      this.handleOnChange(this.state);
+    });
   };
 
   handleOnStateChange = changes => {
     const { type } = changes;
     switch (type) {
+      case Downshift.stateChangeTypes.keyDownArrowDown:
+      case Downshift.stateChangeTypes.keyDownArrowUp:
+      case Downshift.stateChangeTypes.itemMouseEnter:
+        this.setState({ highlightedIndex: changes.highlightedIndex });
+        break;
       case Downshift.stateChangeTypes.keyDownEscape:
       case Downshift.stateChangeTypes.mouseUp:
         this.setState({ isOpen: false }, () => {
@@ -148,13 +141,30 @@ export default class MultiSelectV2 extends React.Component {
       // Reference: https://github.com/paypal/downshift/issues/206
       case Downshift.stateChangeTypes.clickButton:
       case Downshift.stateChangeTypes.keyDownSpaceButton:
-        Reflect.has(changes, 'isOpen') && this.handleOnToggleMenu();
+        this.setState(
+          () => {
+            let nextIsOpen = changes.isOpen || false;
+            if (changes.isOpen === false) {
+              // If Downshift is trying to close the menu, but we know the input
+              // is the active element in the document, then keep the menu open
+              if (this.inputNode === document.activeElement) {
+                nextIsOpen = true;
+              }
+            }
+            return {
+              isOpen: nextIsOpen,
+            };
+          },
+          () => {
+            this.handleOnChange(this.state);
+          }
+        );
         break;
     }
   };
 
   render() {
-    const { isOpen } = this.state;
+    const { highlightedIndex, isOpen } = this.state;
     const {
       className: containerClassName,
       items,
@@ -170,6 +180,8 @@ export default class MultiSelectV2 extends React.Component {
       compareItems,
       selectAllLabel,
       light,
+      invalid,
+      invalidText,
     } = this.props;
     const className = cx('bx--multi-select', containerClassName, {
       'bx--list-box--light': light,
@@ -185,8 +197,9 @@ export default class MultiSelectV2 extends React.Component {
           onToggleAll,
         }) => (
           <Downshift
-            itemCount={ items.length }
+            highlightedIndex={highlightedIndex}
             isOpen={isOpen}
+            itemCount={toggleItemSelection ? items.length + 1 : items.length}
             itemToString={itemToString}
             onChange={onItemChange}
             onStateChange={this.handleOnStateChange}
@@ -197,25 +210,13 @@ export default class MultiSelectV2 extends React.Component {
               getItemProps,
               getToggleButtonProps,
               isOpen,
-              selectedItem,
-              highlightedIndex,
               itemToString,
+              highlightedIndex,
+              selectedItem,
             }) => {
-              let toggleItemProps;
               let showCount = selectedItem.length > 0;
               if (inlineSelectedItems && selectedItem.length === items.length) {
                 showCount = false;
-              }
-              if (toggleItemSelection) {
-                toggleItemProps = getItemProps({
-                  item: {
-                    id: 'select-all',
-                    label: selectAllLabel,
-                  },
-                  index: 0,
-                  isActive: false,
-                  onClick: () => onToggleAll(items),
-                });
               }
               let sortedItems = items;
               if (isOpen) {
@@ -231,8 +232,9 @@ export default class MultiSelectV2 extends React.Component {
                   type={type}
                   className={className}
                   disabled={disabled}
-                  {...getRootProps({ refKey: 'innerRef' })}
-                >
+                  invalid={invalid}
+                  invalidText={invalidText}
+                  {...getRootProps({ refKey: 'innerRef' })}>
                   <ListBox.Field {...getToggleButtonProps({ disabled })}>
                     {showCount && (
                       <ListBox.Selection
@@ -258,36 +260,64 @@ export default class MultiSelectV2 extends React.Component {
                           ))
                         )}
                       </div>
-                    ) : <span className="bx--list-box__label">{label}</span>
-                    }
+                    ) : (
+                      <span className="bx--list-box__label">{label}</span>
+                    )}
                     <ListBox.MenuIcon isOpen={isOpen} />
                   </ListBox.Field>
                   {isOpen && (
                     <ListBox.Menu>
                       {toggleItemSelection && (
-                        <ListBox.MenuItem{...toggleItemProps}>
+                        <ListBox.MenuItem
+                          {...getItemProps({
+                            item: {
+                              id: 'select-all',
+                              label: selectAllLabel,
+                            },
+                            index: 0,
+                            isActive: highlightedIndex === 0,
+                            isHighlighted: highlightedIndex === 0,
+                            onKeyDown: e => {
+                              e.preventDefault();
+                              if (e.which === 27) {
+                                onToggleAll(items);
+                              }
+                            },
+                            onClick: e => {
+                              e.preventDefault();
+                              onToggleAll(items);
+                            },
+                          })}>
                           <Checkbox
-                            id={toggleItemProps.id}
+                            id="select-all"
                             name="select-all"
+                            tabIndex={0}
                             checked={selectedItem.length === items.length}
                             readOnly={true}
-                            tabIndex="0"
                             labelText={selectAllLabel}
                           />
                         </ListBox.MenuItem>
                       )}
                       <VirtualList
                         width="100%"
-                        height={ items.length < 5 ? items.length * 42 : 200 }
-                        itemCount={ items.length }
-                        itemSize={ 42 }
+                        height={Math.min(252, items.length * 42)}
+                        itemCount={items.length}
+                        itemSize={42}
                         renderItem={({ index }) => {
                           const item = sortedItems[index];
+                          const itemIndex = toggleItemSelection
+                            ? index + 1
+                            : index;
+                          const isChecked =
+                            selectedItem
+                              .map(selected => selected.id)
+                              .indexOf(item.id) !== -1;
                           const itemProps = getItemProps({
                             item,
-                            index,
-                            isActive: highlightedIndex === index,
-                            isHighlighted: selectedItem === sortedItems[index],
+                            index: itemIndex,
+                            isActive: isChecked,
+                            checked: isChecked,
+                            isHighlighted: highlightedIndex === itemIndex,
                           });
                           const itemText = itemToString(item);
                           return (
@@ -295,9 +325,9 @@ export default class MultiSelectV2 extends React.Component {
                               <Checkbox
                                 id={itemProps.id}
                                 name={itemText}
-                                checked={selectedItem.indexOf(item) !== -1}
+                                checked={isChecked}
                                 readOnly={true}
-                                tabIndex="0"
+                                tabIndex={-1}
                                 labelText={itemText}
                               />
                             </ListBox.MenuItem>
