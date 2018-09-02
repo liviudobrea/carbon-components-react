@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { PureComponent } from 'react';
 import VirtualList from 'react-tiny-virtual-list';
 import Downshift from 'downshift';
 import Search from '../Search';
@@ -12,7 +12,7 @@ import { defaultItemToString } from './tools/itemToString';
 import { defaultSortItems, defaultCompareItems } from './tools/sorting';
 import { defaultFilterItems } from '../ComboBox/tools/filter';
 
-export default class FilterableMultiSelectV2 extends React.Component {
+export default class FilterableMultiSelectV2 extends PureComponent {
   static propTypes = {
     ...sortingPropTypes,
 
@@ -114,6 +114,11 @@ export default class FilterableMultiSelectV2 extends React.Component {
 
   constructor(props) {
     super(props);
+    this.handleOnChange = this.handleOnChange.bind(this);
+    this.handleOnOuterClick = this.handleOnOuterClick.bind(this);
+    this.handleOnStateChange = this.handleOnStateChange.bind(this);
+    this.clearInputValue = this.clearInputValue.bind(this);
+    this.handleOnInputValueChange = this.handleOnInputValueChange.bind(this);
     this.state = {
       isOpen: props.open,
       inputValue: '',
@@ -126,26 +131,10 @@ export default class FilterableMultiSelectV2 extends React.Component {
     }
   };
 
-  handleOnToggleMenu = () => {
-    this.setState(
-      state => ({
-        isOpen: !state.isOpen,
-      }),
-      () => {
-        this.handleOnChange(this.state);
-      }
-    );
-  };
-
   handleOnOuterClick = () => {
-    this.setState(
-      {
-        isOpen: false,
-      },
-      () => {
-        this.handleOnChange(this.state);
-      }
-    );
+    this.setState({ isOpen: false }, () => {
+      this.handleOnChange(this.state);
+    });
   };
 
   handleOnStateChange = changes => {
@@ -255,39 +244,28 @@ export default class FilterableMultiSelectV2 extends React.Component {
         }) => (
           <Downshift
             isOpen={isOpen}
-            itemCount={ items.length }
+            itemCount={toggleItemSelection ? items.length + 1 : items.length}
             inputValue={inputValue}
-            onInputValueChange={this.handleOnInputValueChange}
-            onChange={onItemChange}
             itemToString={itemToString}
+            onChange={onItemChange}
             onStateChange={this.handleOnStateChange}
             onOuterClick={this.handleOnOuterClick}
+            onInputValueChange={this.handleOnInputValueChange}
             selectedItem={selectedItems}
             render={({
-              getToggleButtonProps,
-              getInputProps,
-              getItemProps,
               getRootProps,
+              getItemProps,
+              getInputProps,
+              getToggleButtonProps,
               isOpen,
-               highlightedIndex,
+              itemToString,
+              highlightedIndex,
               inputValue,
               selectedItem,
             }) => {
-              let toggleItemProps;
               let showCount = selectedItem.length > 0;
               if (inlineSelectedItems && selectedItem.length === items.length) {
                 showCount = false;
-              }
-              if (toggleItemSelection) {
-                toggleItemProps = getItemProps({
-                  item: {
-                    id: 'select-all',
-                    label: selectAllLabel,
-                  },
-                  index: 0,
-                  isActive: false,
-                  onClick: () => onToggleAll(items),
-                });
               }
               let sortedItems = items;
               if (isOpen) {
@@ -306,8 +284,7 @@ export default class FilterableMultiSelectV2 extends React.Component {
                   className={className}
                   disabled={disabled}
                   type={type}
-                  {...getRootProps({ refKey: 'innerRef' })}
-                >
+                  {...getRootProps({ refKey: 'innerRef' })}>
                   <ListBox.Field {...getToggleButtonProps({ disabled })}>
                     {showCount && (
                       <ListBox.Selection
@@ -355,8 +332,9 @@ export default class FilterableMultiSelectV2 extends React.Component {
                             ))
                           )}
                         </div>
-                      ) : <span className="bx--list-box__label">{label}</span>
-                      )}
+                      ) : (
+                        <span className="bx--list-box__label">{label}</span>
+                      ))}
                     <ListBox.MenuIcon isOpen={isOpen} />
                   </ListBox.Field>
                   {isOpen && (
@@ -378,34 +356,57 @@ export default class FilterableMultiSelectV2 extends React.Component {
                         </ListBox.MenuItem>
                       )}
                       {toggleItemSelection && (
-                        <ListBox.MenuItem {...toggleItemProps}>
+                        <ListBox.MenuItem
+                          {...getItemProps({
+                            item: {
+                              id: 'select-all',
+                              label: selectAllLabel,
+                            },
+                            index: 0,
+                            isActive: highlightedIndex === 0,
+                            isHighlighted: highlightedIndex === 0,
+                            onKeyDown: e => {
+                              e.preventDefault();
+                              if (e.which === 27) {
+                                onToggleAll(items);
+                              }
+                            },
+                            onClick: e => {
+                              e.preventDefault();
+                              onToggleAll(items);
+                            },
+                          })}>
                           <Checkbox
-                            id={toggleItemProps.id}
+                            id="select-all"
                             name="select-all"
+                            tabIndex={0}
                             checked={selectedItem.length === items.length}
                             readOnly={true}
-                            tabIndex="0"
                             labelText={selectAllLabel}
                           />
                         </ListBox.MenuItem>
                       )}
                       <VirtualList
                         width="100%"
-                        height={
-                          sortedItems.length < 5
-                          ? sortedItems.length * 42
-                          : 200
-                        }
-                        itemCount={ sortedItems.length }
-                        itemSize={ 42 }
+                        height={Math.min(252, sortedItems.length * 42)}
+                        itemCount={sortedItems.length}
+                        itemSize={42}
                         renderItem={({ index, style }) => {
                           const item = sortedItems[index];
+                          const itemIndex = toggleItemSelection
+                            ? index + 1
+                            : index;
+                          const isChecked =
+                            selectedItem
+                              .map(selected => selected.id)
+                              .indexOf(item.id) !== -1;
                           const itemProps = getItemProps({
                             item,
-                            index,
+                            index: itemIndex,
                             style,
-                            isActive: highlightedIndex === index,
-                            isHighlighted: selectedItem === sortedItems[index],
+                            isActive: isChecked,
+                            checked: isChecked,
+                            isHighlighted: highlightedIndex === itemIndex,
                           });
                           const itemText = itemToString(item);
                           return (
@@ -413,9 +414,9 @@ export default class FilterableMultiSelectV2 extends React.Component {
                               <Checkbox
                                 id={itemProps.id}
                                 name={itemText}
-                                checked={selectedItem.indexOf(item) !== -1}
+                                checked={isChecked}
                                 readOnly={true}
-                                tabIndex="0"
+                                tabIndex={0}
                                 labelText={itemText}
                               />
                             </ListBox.MenuItem>
