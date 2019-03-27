@@ -1,12 +1,19 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import Slider from '../Slider';
 import SliderSkeleton from '../Slider/Slider.Skeleton';
 import { mount, shallow } from 'enzyme';
 import 'requestanimationframe';
+import { breakingChangesX } from '../../internal/FeatureFlags';
 
 describe('Slider', () => {
   describe('Renders as expected', () => {
-    const mockFn = jest.fn();
     const wrapper = mount(
       <Slider
         id="slider"
@@ -15,7 +22,6 @@ describe('Slider', () => {
         min={0}
         max={100}
         step={1}
-        onChange={mockFn}
       />
     );
 
@@ -94,7 +100,8 @@ describe('Slider', () => {
   });
 
   describe('updatePosition method', () => {
-    const mockFn = jest.fn();
+    const handleChange = jest.fn();
+    const handleRelease = jest.fn();
     const wrapper = mount(
       <Slider
         id="slider"
@@ -103,7 +110,8 @@ describe('Slider', () => {
         min={0}
         max={100}
         step={1}
-        onChange={mockFn}
+        onChange={handleChange}
+        onRelease={handleRelease}
       />
     );
 
@@ -113,7 +121,7 @@ describe('Slider', () => {
         which: '38',
       };
       wrapper.instance().updatePosition(evt);
-      expect(mockFn).lastCalledWith({ value: 51 });
+      expect(handleChange).lastCalledWith({ value: 51 });
       expect(wrapper.state().value).toEqual(51);
     });
 
@@ -123,7 +131,7 @@ describe('Slider', () => {
         which: '40',
       };
       wrapper.instance().updatePosition(evt);
-      expect(mockFn).lastCalledWith({ value: 50 });
+      expect(handleChange).lastCalledWith({ value: 50 });
       expect(wrapper.state().value).toEqual(50);
     });
 
@@ -133,9 +141,90 @@ describe('Slider', () => {
         clientX: '1000',
       };
       wrapper.instance().updatePosition(evt);
-      expect(mockFn).lastCalledWith({ value: 100 });
+      expect(handleChange).lastCalledWith({ value: 100 });
       expect(wrapper.state().value).toEqual(100);
     });
+
+    describe('user is holding the handle', () => {
+      it('does not call onRelease', () => {
+        handleRelease.mockClear();
+        expect(handleRelease).not.toHaveBeenCalled();
+
+        wrapper.instance().handleMouseStart();
+        wrapper.instance().updatePosition();
+        expect(handleRelease).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('user releases the handle', () => {
+      it('calls onRelease', () => {
+        handleRelease.mockClear();
+        expect(handleRelease).not.toHaveBeenCalled();
+        wrapper.setState({
+          holding: false,
+        });
+        wrapper.instance().updatePosition();
+        expect(handleRelease).toHaveBeenCalled();
+      });
+    });
+  });
+});
+
+describe('handleMouseEnd', () => {
+  const handleChange = jest.fn();
+  const handleRelease = jest.fn();
+  const wrapper = mount(
+    <Slider
+      id="slider"
+      className="extra-class"
+      value={50}
+      min={0}
+      max={100}
+      step={1}
+      onChange={handleChange}
+      onRelease={handleRelease}
+    />
+  );
+  it('calls onRelease', () => {
+    if (!breakingChangesX) {
+      // `onChange`/`onRelease` fired only upon user gesture in `v10`
+      // TODO: See if we can create a better test case here
+      wrapper.setState({
+        value: 130,
+      });
+      expect(handleRelease).lastCalledWith({ value: 50 });
+      wrapper.instance().handleMouseEnd();
+      expect(handleRelease).lastCalledWith({ value: 130 });
+    }
+  });
+});
+
+describe('handleTouchEnd', () => {
+  const handleChange = jest.fn();
+  const handleRelease = jest.fn();
+  const wrapper = mount(
+    <Slider
+      id="slider"
+      className="extra-class"
+      value={50}
+      min={0}
+      max={100}
+      step={1}
+      onChange={handleChange}
+      onRelease={handleRelease}
+    />
+  );
+  it('calls onRelease', () => {
+    if (!breakingChangesX) {
+      // `onChange`/`onRelease` fired only upon user gesture in `v10`
+      // TODO: See if we can create a better test case here
+      wrapper.setState({
+        value: 385,
+      });
+      expect(handleRelease).lastCalledWith({ value: 50 });
+      wrapper.instance().handleTouchEnd();
+      expect(handleRelease).lastCalledWith({ value: 385 });
+    }
   });
 });
 

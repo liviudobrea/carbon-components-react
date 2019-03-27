@@ -1,7 +1,16 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
+import CloseFilled16 from '@carbon/icons-react/lib/close--filled/16';
 import FileUploader, { FileUploaderButton, Filename } from '../FileUploader';
 import FileUploaderSkeleton from '../FileUploader/FileUploader.Skeleton';
 import { mount, shallow } from 'enzyme';
+import { componentsX } from '../../internal/FeatureFlags';
 
 describe('Filename', () => {
   const mountWrapper = mount(<Filename name={'trees.jpg'} />);
@@ -10,7 +19,9 @@ describe('Filename', () => {
     it('should have a click event', () => {
       const onClick = jest.fn();
       mountWrapper.setProps({ onClick, status: 'edit' });
-      mountWrapper.find('Icon').simulate('click');
+      mountWrapper
+        .find(!componentsX ? 'Icon' : CloseFilled16)
+        .simulate('click');
       expect(onClick).toBeCalled();
     });
   });
@@ -22,7 +33,7 @@ describe('FileUploaderButton', () => {
 
   describe('Renders as expected with default props', () => {
     it('renders with expected className', () => {
-      expect(mountWrapper.children().hasClass('bx--file')).toBe(true);
+      expect(mountWrapper.find('label').hasClass('bx--btn')).toBe(true);
     });
 
     it('renders with given className', () => {
@@ -51,6 +62,16 @@ describe('FileUploaderButton', () => {
 
     it('renders with default accept prop', () => {
       expect(mountWrapper.props().accept).toEqual([]);
+    });
+
+    it('renders with default disabled prop', () => {
+      expect(mountWrapper.props().disabled).toBe(false);
+    });
+
+    it('disables file upload input', () => {
+      const wrapper = shallow(button);
+      wrapper.setProps({ disabled: true });
+      expect(wrapper.find('input').prop('disabled')).toEqual(true);
     });
 
     it('does not have default role', () => {

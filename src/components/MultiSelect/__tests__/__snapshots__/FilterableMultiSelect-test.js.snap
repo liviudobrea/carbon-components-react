@@ -39,6 +39,7 @@ exports[`MultiSelect.Filterable should render 1`] = `
   light={false}
   locale="en"
   onChange={[MockFunction]}
+  open={false}
   placeholder="Placeholder..."
   sortItems={[Function]}
 >
@@ -75,6 +76,7 @@ exports[`MultiSelect.Filterable should render 1`] = `
         className="bx--multi-select bx--combo-box"
         disabled={false}
         innerRef={[Function]}
+        innerTabIndex="-1"
         type="default"
       >
         <div
@@ -83,7 +85,7 @@ exports[`MultiSelect.Filterable should render 1`] = `
           onClick={[Function]}
           onKeyDown={[Function]}
           role="listbox"
-          tabIndex="0"
+          tabIndex="-1"
         >
           <ListBoxField
             aria-expanded={false}
@@ -137,6 +139,7 @@ exports[`MultiSelect.Filterable should render 1`] = `
                     alt="Open menu"
                     description="Open menu"
                     fillRule="evenodd"
+                    focusable="false"
                     icon={
                       Object {
                         "height": "5",
@@ -166,6 +169,7 @@ exports[`MultiSelect.Filterable should render 1`] = `
                       alt="Open menu"
                       aria-label="Open menu"
                       fillRule="evenodd"
+                      focusable="false"
                       height="5"
                       role="img"
                       viewBox="0 0 10 5"

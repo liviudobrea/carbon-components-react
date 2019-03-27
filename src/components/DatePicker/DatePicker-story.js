@@ -1,7 +1,14 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action, decorateAction } from '@storybook/addon-actions';
-import { withInfo } from '@storybook/addon-info';
+
 import { withKnobs, boolean, select, text } from '@storybook/addon-knobs';
 import DatePicker from '../DatePicker';
 import DatePickerInput from '../DatePickerInput';
@@ -15,8 +22,8 @@ const datePickerOnChangeActions = decorateAction([
 ]);
 
 const patterns = {
-  'd{1,2}/d{4}': 'Short (d{1,2}/d{4})',
-  'd{1,2}/d{1,2}/d{4}': 'Regular (d{1,2}/d{1,2}/d{4})',
+  'Short (d{1,2}/d{4})': 'd{1,2}/d{4}',
+  'Regular (d{1,2}/d{1,2}/d{4})': 'd{1,2}/d{1,2}/d{4}',
 };
 
 const props = {
@@ -50,6 +57,10 @@ const props = {
       'Form validation UI content (invalidText in <DatePickerInput>)',
       'A valid value is required'
     ),
+    iconDescription: text(
+      'Icon description (iconDescription in <DatePickerInput>)',
+      'Icon description'
+    ),
     onClick: action('onClick'),
     onChange: action('onInputChange'),
   }),
@@ -59,24 +70,24 @@ storiesOf('DatePicker', module)
   .addDecorator(withKnobs)
   .add(
     'simple',
-    withInfo({
-      text: 'A simple Date Picker consists of an input field and no calendar.',
-    })(() => (
+    () => (
       <DatePicker
         {...props.datePicker()}
         short={boolean('Use shorter width (short in <DatePicker>)', false)}
         datePickerType="simple">
         <DatePickerInput {...props.datePickerInput()} />
       </DatePicker>
-    ))
+    ),
+    {
+      info: {
+        text:
+          'A simple Date Picker consists of an input field and no calendar.',
+      },
+    }
   )
   .add(
     'single with calendar',
-    withInfo({
-      text: `
-        A single Date Picker consists of an input field and a calendar.
-      `,
-    })(() => (
+    () => (
       <DatePicker
         {...props.datePicker()}
         datePickerType="single"
@@ -86,15 +97,18 @@ storiesOf('DatePicker', module)
         )}>
         <DatePickerInput {...props.datePickerInput()} />
       </DatePicker>
-    ))
+    ),
+    {
+      info: {
+        text: `
+            A single Date Picker consists of an input field and a calendar.
+          `,
+      },
+    }
   )
   .add(
     'range with calendar',
-    withInfo({
-      text: `
-        A range Date Picker consists of two input fields and a calendar.
-      `,
-    })(() => {
+    () => {
       const datePickerInputProps = props.datePickerInput();
       return (
         <DatePicker
@@ -103,6 +117,10 @@ storiesOf('DatePicker', module)
           dateFormat={text(
             'The date format (dateFormat in <DatePicker>)',
             'm/d/Y'
+          )}
+          iconDescription={text(
+            'Icon description (iconDescription in <DatePicker>)',
+            'Icon description'
           )}>
           <DatePickerInput
             {...datePickerInputProps}
@@ -114,16 +132,19 @@ storiesOf('DatePicker', module)
           />
         </DatePicker>
       );
-    })
+    },
+    {
+      info: {
+        text: `
+            A range Date Picker consists of two input fields and a calendar.
+          `,
+      },
+    }
   )
   .add(
     'range with calendar and min/max dates',
-    withInfo({
-      text: `
-        A range Date Picker consists of two input fields and a calendar, and optionally, the minDate and maxDate fields.
-      `,
-    })(() => {
-      const datePickerInputProps = props.datePicker();
+    () => {
+      const datePickerInputProps = props.datePickerInput();
       return (
         <DatePicker
           {...props.datePicker()}
@@ -141,16 +162,18 @@ storiesOf('DatePicker', module)
           />
         </DatePicker>
       );
-    })
+    },
+    {
+      info: {
+        text: `
+            A range Date Picker consists of two input fields and a calendar, and optionally, the minDate and maxDate fields.
+          `,
+      },
+    }
   )
   .add(
     'fully controlled',
-    withInfo({
-      text: `
-        If your application needs to control the value of the date picker and
-        be notified of any changes.
-      `,
-    })(() => (
+    () => (
       <WithState initialState={{ date: '' }}>
         {({ state, setState }) => (
           <>
@@ -175,13 +198,20 @@ storiesOf('DatePicker', module)
           </>
         )}
       </WithState>
-    ))
+    ),
+    {
+      info: {
+        text: `
+            If your application needs to control the value of the date picker and
+            be notified of any changes.
+          `,
+      },
+    }
   )
-  .add(
-    'skeleton',
-    withInfo({
+  .add('skeleton', () => <DatePickerSkeleton range />, {
+    info: {
       text: `
-        Placeholder skeleton state to use when content is loading.
-        `,
-    })(() => <DatePickerSkeleton range />)
-  );
+            Placeholder skeleton state to use when content is loading.
+            `,
+    },
+  });

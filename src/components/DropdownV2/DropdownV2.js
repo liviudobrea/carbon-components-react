@@ -1,8 +1,18 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import cx from 'classnames';
 import Downshift from 'downshift';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { settings } from 'carbon-components';
 import ListBox, { PropTypes as ListBoxPropTypes } from '../ListBox';
+
+const { prefix } = settings;
 
 const defaultItemToString = item => {
   if (typeof item === 'string') {
@@ -42,6 +52,12 @@ export default class DropdownV2 extends React.Component {
     itemToString: PropTypes.func,
 
     /**
+     * Function to render items as custom components instead of strings.
+     * Defaults to null and is overriden by a getter
+     */
+    itemToElement: PropTypes.func,
+
+    /**
      * `onChange` is a utility for this controlled component to communicate to a
      * consuming component what kind of internal state changes are occuring.
      */
@@ -54,6 +70,11 @@ export default class DropdownV2 extends React.Component {
     label: PropTypes.node.isRequired,
 
     /**
+     * 'aria-label' of the ListBox component.
+     */
+    ariaLabel: PropTypes.string,
+
+    /**
      * The dropdown type, `default` or `inline`
      */
     type: ListBoxPropTypes.ListBoxType,
@@ -61,7 +82,7 @@ export default class DropdownV2 extends React.Component {
     /**
      * In the case you want to control the dropdown selection entirely.
      */
-    selectedItem: PropTypes.object,
+    selectedItem: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
 
     /**
      * `true` to use the light version.
@@ -72,14 +93,29 @@ export default class DropdownV2 extends React.Component {
      * Controls the open state of the dropdown
      */
     open: PropTypes.bool,
+
+    /**
+     * Provide the title text that will be read by a screen reader when
+     * visiting this control
+     */
+    titleText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+
+    /**
+     * Provide helper text that is used alongside the control label for
+     * additional help
+     */
+    helperText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   };
 
   static defaultProps = {
     disabled: false,
     type: 'default',
     itemToString: defaultItemToString,
+    itemToElement: null,
     open: false,
     light: false,
+    titleText: '',
+    helperText: '',
   };
 
   state = { isOpen: this.props.open };
@@ -127,18 +163,33 @@ export default class DropdownV2 extends React.Component {
       disabled,
       items,
       label,
+      ariaLabel,
       itemToString,
+      itemToElement,
       type,
       initialSelectedItem,
       selectedItem,
       light,
       id,
+      titleText,
+      helperText,
     } = this.props;
     const { isOpen } = this.state;
-    const className = cx('bx--dropdown', containerClassName, {
-      'bx--dropdown--light': light,
+    const className = cx(`${prefix}--dropdown`, containerClassName, {
+      [`${prefix}--dropdown--light`]: light,
     });
-    return (
+    const title = titleText ? (
+      <label htmlFor={id} className={`${prefix}--label`}>
+        {titleText}
+      </label>
+    ) : null;
+    const helper = helperText ? (
+      <div className={`${prefix}--form__helper-text`}>{helperText}</div>
+    ) : null;
+
+    // needs to be Capitalized for react to render it correctly
+    const ItemToElement = itemToElement;
+    const Dropdown = (
       <Downshift
         id={id}
         onStateChange={this.handleOnStateChange}
@@ -162,9 +213,12 @@ export default class DropdownV2 extends React.Component {
             type={type}
             className={className}
             disabled={disabled}
+            ariaLabel={ariaLabel}
             {...getRootProps({ refKey: 'innerRef' })}>
             <ListBox.Field {...getToggleButtonProps({ disabled })}>
-              <span className="bx--list-box__label" {...getLabelProps()}>
+              <span
+                className={`${prefix}--list-box__label`}
+                {...getLabelProps()}>
                 {selectedItem ? itemToString(selectedItem) : label}
               </span>
               <ListBox.MenuIcon isOpen={isOpen} />
@@ -178,10 +232,14 @@ export default class DropdownV2 extends React.Component {
                       item,
                       index,
                       isActive: selectedItem === item,
-                      isHighlighted: highlightedIndex === index
+                      isHighlighted: highlightedIndex === index || selectedItem === item
                     })}
                   >
-                    {itemToString(item)}
+                    {itemToElement ? (
+                      <ItemToElement key={itemToString(item)} {...item} />
+                    ) : (
+                      itemToString(item)
+                    )}
                   </ListBox.MenuItem>
                 ))}
               </ListBox.Menu>
@@ -189,6 +247,15 @@ export default class DropdownV2 extends React.Component {
           </ListBox>
         )}
       />
+    );
+    return title || helper ? (
+      <>
+        {title}
+        {helper}
+        {Dropdown}
+      </>
+    ) : (
+      Dropdown
     );
   }
 }

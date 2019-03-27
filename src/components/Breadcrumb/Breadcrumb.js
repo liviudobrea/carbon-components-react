@@ -1,14 +1,40 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import PropTypes from 'prop-types';
 import React from 'react';
-import classnames from 'classnames';
+import cx from 'classnames';
+import { settings } from 'carbon-components';
+import { componentsX } from '../../internal/FeatureFlags';
 
-const Breadcrumb = ({ children, className, noTrailingSlash, ...other }) => {
-  const classNames = classnames(className, {
-    'bx--breadcrumb': true,
-    'bx--breadcrumb--no-trailing-slash': noTrailingSlash,
+const { prefix } = settings;
+
+const Breadcrumb = ({
+  children,
+  className: customClassName,
+  noTrailingSlash,
+  ...rest
+}) => {
+  const className = cx({
+    [`${prefix}--breadcrumb`]: true,
+    [`${prefix}--breadcrumb--no-trailing-slash`]: noTrailingSlash,
+    [customClassName]: !!customClassName,
   });
+
+  if (componentsX) {
+    return (
+      <nav className={className} {...rest}>
+        {children}
+      </nav>
+    );
+  }
+
   return (
-    <div className={classNames} {...other}>
+    <div className={className} {...rest}>
       {children}
     </div>
   );

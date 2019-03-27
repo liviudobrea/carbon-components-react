@@ -1,6 +1,14 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import RadioButton from '../RadioButton';
 import { mount } from 'enzyme';
+import { breakingChangesX } from '../../internal/FeatureFlags';
 
 const render = props =>
   mount(
@@ -79,7 +87,13 @@ describe('RadioButton', () => {
 
     describe('wrapper', () => {
       it('should have the correct class', () => {
-        expect(div.hasClass('radioButtonWrapper')).toEqual(true);
+        expect(
+          div.hasClass(
+            !breakingChangesX
+              ? 'radioButtonWrapper'
+              : 'bx--radio-button-wrapper'
+          )
+        ).toEqual(true);
       });
 
       it('should have extra classes applied', () => {

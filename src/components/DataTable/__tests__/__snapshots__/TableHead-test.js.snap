@@ -2,6 +2,8 @@
 
 exports[`DataTable.TableHead should render 1`] = `
 <Table
+  short={false}
+  shouldShowBorder={true}
   zebra={true}
 >
   <table

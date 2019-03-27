@@ -1,8 +1,17 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import { iconCopy } from 'carbon-icons';
 import CopyButton from '../CopyButton';
+import Copy16 from '@carbon/icons-react/lib/copy/16';
 import Icon from '../Icon';
 import { shallow, mount } from 'enzyme';
+import { componentsX } from '../../internal/FeatureFlags';
 
 jest.useFakeTimers();
 
@@ -29,8 +38,12 @@ describe('CopyButton', () => {
       expect(wrapper.is('button')).toBe(true);
       expect(wrapper.hasClass('bx--snippet-button')).toBe(true);
       expect(wrapper.find('.bx--btn--copy__feedback').length).toBe(1);
-      expect(wrapper.find(Icon).length).toBe(1);
-      expect(wrapper.find(Icon).props().icon).toBe(iconCopy);
+      if (componentsX) {
+        expect(wrapper.find(Copy16).length).toBe(1);
+      } else {
+        expect(wrapper.find(Icon).length).toBe(1);
+        expect(wrapper.find(Icon).props().icon).toBe(iconCopy);
+      }
     });
 
     it('Should be able to disable the button', () => {

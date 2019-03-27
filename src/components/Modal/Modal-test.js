@@ -1,8 +1,17 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
+import Close20 from '@carbon/icons-react/lib/close/20';
 import Icon from '../Icon';
 import Modal from '../Modal';
 import ModalWrapper from '../ModalWrapper';
 import { shallow, mount } from 'enzyme';
+import { componentsX } from '../../internal/FeatureFlags';
 
 describe('Modal', () => {
   describe('Renders as expected', () => {
@@ -41,24 +50,21 @@ describe('Modal', () => {
     });
 
     it('should have iconDescription match Icon component description prop', () => {
-      const matches =
-        mounted.props().iconDescription ===
-        mounted.find(Icon).props().description;
+      const description = !componentsX
+        ? mounted.find(Icon).props().description
+        : mounted.find(Close20).props()['aria-label'];
+      const matches = mounted.props().iconDescription === description;
       expect(matches).toEqual(true);
     });
 
     it('enables primary button by default', () => {
-      const primaryButton = mounted
-        .find('.bx--modal__buttons-container .bx--btn')
-        .at(0);
+      const primaryButton = mounted.find('.bx--btn.bx--btn--primary').at(0);
       expect(primaryButton.prop('disabled')).toEqual(false);
     });
 
     it('disables primary button when diablePrimaryButton prop is passed', () => {
       mounted.setProps({ primaryButtonDisabled: true });
-      const primaryButton = mounted
-        .find('.bx--modal__buttons-container .bx--btn')
-        .at(1);
+      const primaryButton = mounted.find('.bx--btn.bx--btn--primary').at(0);
       expect(primaryButton.props().disabled).toEqual(true);
     });
   });
@@ -80,8 +86,7 @@ describe('Modal', () => {
       const wrapper = shallow(
         <Modal primaryButtonText="Submit" secondaryButtonText="Cancel" />
       );
-      const modalButtons = wrapper.find('.bx--modal__buttons-container').props()
-        .children;
+      const modalButtons = wrapper.find('.bx--modal-footer').props().children;
       expect(modalButtons[0].props.children).toEqual('Cancel');
       expect(modalButtons[1].props.children).toEqual('Submit');
     });
@@ -214,9 +219,10 @@ describe('Danger Modal', () => {
     });
 
     it('has correct button combination', () => {
-      const modalButtons = wrapper.find('.bx--modal__buttons-container').props()
-        .children;
-      expect(modalButtons[0].props.kind).toEqual('tertiary');
+      const modalButtons = wrapper.find('.bx--modal-footer').props().children;
+      expect(modalButtons[0].props.kind).toEqual(
+        !componentsX ? 'tertiary' : 'secondary'
+      );
       expect(modalButtons[1].props.kind).toEqual('danger--primary');
     });
   });

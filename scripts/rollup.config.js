@@ -77,6 +77,7 @@ module.exports = {
         ],
         'node_modules/react-hot-loader/patch.js': ['areComponentsEqual'],
         'node_modules/react-dom/index.js': ['render'],
+        'node_modules/react-is/index.js': ['isForwardRef'],
       },
     }),
     babel({
@@ -87,7 +88,9 @@ module.exports = {
     }),
     ...prodSettings,
   ],
-  external: peerDependencies,
+  external: peerDependencies.filter(
+    dependency => dependency !== 'carbon-components'
+  ),
   output: {
     name: 'CarbonComponentsReact',
     format: 'umd',

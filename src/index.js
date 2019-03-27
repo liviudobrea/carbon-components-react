@@ -1,7 +1,13 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 export Accordion from './components/Accordion';
 export AccordionItem from './components/AccordionItem';
-export Breadcrumb from './components/Breadcrumb';
-export BreadcrumbItem from './components/BreadcrumbItem';
+export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb';
 export Button from './components/Button';
 export Checkbox from './components/Checkbox';
 export CodeSnippet from './components/CodeSnippet';
@@ -115,6 +121,7 @@ export TooltipIcon from './components/TooltipIcon';
 export TooltipSimple from './components/TooltipSimple';
 export UnorderedList from './components/UnorderedList';
 export SkeletonText from './components/SkeletonText';
+export SkeletonPlaceholder from './components/SkeletonPlaceholder';
 export DataTableSkeleton from './components/DataTableSkeleton';
 export AccordionSkeleton from './components/Accordion/Accordion.Skeleton';
 export BreadcrumbSkeleton from './components/Breadcrumb/Breadcrumb.Skeleton';
@@ -129,6 +136,7 @@ export RadioButtonSkeleton from './components/RadioButton/RadioButton.Skeleton';
 export SearchSkeleton from './components/Search/Search.Skeleton';
 export SelectSkeleton from './components/Select/Select.Skeleton';
 export SliderSkeleton from './components/Slider/Slider.Skeleton';
+export StructuredListSkeleton from './components/StructuredList/StructuredList.Skeleton';
 export TabsSkeleton from './components/Tabs/Tabs.Skeleton';
 export TagSkeleton from './components/Tag/Tag.Skeleton';
 export TextAreaSkeleton from './components/TextArea/TextArea.Skeleton';
@@ -136,3 +144,4 @@ export TextInputSkeleton from './components/TextInput/TextInput.Skeleton';
 export ToggleSkeleton from './components/Toggle/Toggle.Skeleton';
 export ToggleSmallSkeleton from './components/ToggleSmall/ToggleSmall.Skeleton';
 export IconSkeleton from './components/Icon/Icon.Skeleton';
+export DatePickerSkeleton from './components/DatePicker/DatePicker.Skeleton';

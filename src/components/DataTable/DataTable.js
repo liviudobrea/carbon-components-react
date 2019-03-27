@@ -1,3 +1,10 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import isEqual from 'lodash.isequal';
@@ -90,6 +97,21 @@ export default class DataTable extends React.Component {
      * available message ids.
      */
     translateWithId: PropTypes.func,
+
+    /**
+     * Optional boolean to create a short data table.
+     */
+    short: PropTypes.bool,
+
+    /**
+     * Optional boolean to remove borders from data table.
+     */
+    shouldShowBorder: PropTypes.bool,
+
+    /**
+     * Specify whether the control should be a radio button or inline checkbox
+     */
+    radio: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -97,6 +119,8 @@ export default class DataTable extends React.Component {
     filterRows: defaultFilterRows,
     locale: 'en',
     translateWithId,
+    short: false,
+    shouldShowBorder: true,
   };
 
   static translationKeys = Object.values(translationKeys);
@@ -149,8 +173,27 @@ export default class DataTable extends React.Component {
       isSortHeader: sortHeaderKey === header.key,
       // Compose the event handlers so we don't overwrite a consumer's `onClick`
       // handler
-      onClick: composeEventHandlers([this.handleSortBy(header.key), onClick]),
+      onClick: composeEventHandlers([
+        this.handleSortBy(header.key),
+        onClick
+          ? this.handleOnHeaderClick(onClick, {
+              sortHeaderKey: header.key,
+              sortDirection,
+            })
+          : null,
+      ]),
     };
+  };
+
+  /**
+   * Decorate consumer's `onClick` event handler with sort parameters
+   *
+   * @param {Function} onClick
+   * @param {Object} sortParams
+   * @returns {Function}
+   */
+  handleOnHeaderClick = (onClick, sortParams) => {
+    return e => onClick(e, sortParams);
   };
 
   /**
@@ -174,6 +217,7 @@ export default class DataTable extends React.Component {
       onExpand: composeEventHandlers([this.handleOnExpandRow(row.id), onClick]),
       isExpanded: row.isExpanded,
       ariaLabel: t(translationKey),
+      isSelected: row.isSelected,
     };
   };
 
@@ -203,6 +247,7 @@ export default class DataTable extends React.Component {
         id: `${this.getTablePrefix()}__select-row-${row.id}`,
         name: `select-row-${row.id}`,
         ariaLabel: t(translationKey),
+        radio: this.props.radio || null,
       };
     }
 
@@ -236,6 +281,16 @@ export default class DataTable extends React.Component {
       shouldShowBatchActions,
       totalSelected,
       onCancel: this.handleOnCancel,
+    };
+  };
+  /**
+   * Helper utility to get the Table Props.
+   */
+  getTableProps = () => {
+    const { short, shouldShowBorder } = this.props;
+    return {
+      short,
+      shouldShowBorder,
     };
   };
 
@@ -315,9 +370,28 @@ export default class DataTable extends React.Component {
   handleOnSelectRow = rowId => () => {
     this.setState(state => {
       const row = state.rowsById[rowId];
-      const selectedRows = state.rowIds.filter(id => {
-        return state.rowsById[id].isSelected;
-      }).length;
+      if (this.props.radio) {
+        // deselect all radio buttons
+        const rowsById = Object.entries(state.rowsById).reduce((p, c) => {
+          const [key, val] = c;
+          val.isSelected = false;
+          p[key] = val;
+          return p;
+        }, {});
+        return {
+          shouldShowBatchActions: false,
+          rowsById: {
+            ...rowsById,
+            [rowId]: {
+              ...row,
+              isSelected: !row.isSelected,
+            },
+          },
+        };
+      }
+      const selectedRows = state.rowIds.filter(
+        id => state.rowsById[id].isSelected
+      ).length;
       // Predict the length of the selected rows after this change occurs
       const selectedRowsCount = !row.isSelected
         ? selectedRows + 1
@@ -405,6 +479,7 @@ export default class DataTable extends React.Component {
       getRowProps: this.getRowProps,
       getSelectionProps: this.getSelectionProps,
       getBatchActionProps: this.getBatchActionProps,
+      getTableProps: this.getTableProps,
 
       // Custom event handlers
       onInputChange: this.handleOnInputValueChange,
@@ -414,6 +489,8 @@ export default class DataTable extends React.Component {
       selectAll: this.handleSelectAll,
       selectRow: rowId => this.handleOnSelectRow(rowId)(),
       expandRow: rowId => this.handleOnExpandRow(rowId)(),
+
+      radio: this.props.radio,
     };
 
     if (render !== undefined) {

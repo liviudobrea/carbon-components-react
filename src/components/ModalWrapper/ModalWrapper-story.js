@@ -1,57 +1,97 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
+import { iconAddSolid, iconSearch } from 'carbon-icons';
+import AddFilled16 from '@carbon/icons-react/lib/add--filled/16';
+import Search16 from '@carbon/icons-react/lib/search/16';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { withInfo } from '@storybook/addon-info';
-import { withKnobs, boolean, text } from '@storybook/addon-knobs';
+
+import { withKnobs, boolean, text, select } from '@storybook/addon-knobs';
+import { settings } from 'carbon-components';
 import ModalWrapper from '../ModalWrapper';
 import TextInput from '../TextInput';
 import Select from '../Select';
 import SelectItem from '../SelectItem';
 import RadioButtonGroup from '../RadioButtonGroup';
 import RadioButton from '../RadioButton';
+import { breakingChangesX } from '../../internal/FeatureFlags';
 
-const props = () => ({
-  className: 'some-class',
-  disabled: boolean('Disable the launcher button (disabled)', false),
-  passiveModal: boolean('Without footer (passiveModal)', false),
-  buttonTriggerText: text(
-    'The text in the trigger button (buttonTriggerText)',
-    'Launch Modal'
+const { prefix } = settings;
+
+const icons = {
+  None: 'None',
+  ...(breakingChangesX
+    ? {}
+    : {
+        'Add with filled circle (iconAddSolid from `carbon-icons`)':
+          'iconAddSolid',
+        'Search (iconSearch from `carbon-icons`)': 'iconSearch',
+      }),
+  'Add with filled circle (AddFilled16 from `@carbon/icons`)': 'AddFilled16',
+  'Search (Search16 from `@carbon/icons`)': 'Search16',
+};
+
+const iconMap = {
+  iconAddSolid,
+  iconSearch,
+  AddFilled16: props => (
+    <AddFilled16 className={`${prefix}--btn__icon`} {...props} />
   ),
-  modalLabel: text('The modal label (optional) (modalLabel)', 'Label'),
-  modalHeading: text('The modal heading (modalHeading)', 'Modal'),
-  primaryButtonText: text(
-    'The text in the primary button (primaryButtonText)',
-    'Save'
-  ),
-  secondaryButtonText: text(
-    'The text in the secondary button (secondaryButtonText)',
-    'Cancel'
-  ),
-  shouldCloseAfterSubmit: boolean(
-    'Close after submit (shouldCloseAfterSubmit)',
-    true
-  ),
-  onBlur: action('onBlur'),
-  onClick: action('onClick'),
-  onFocus: action('onFocus'),
-  onMouseDown: action('onMouseDown'),
-  onMouseEnter: action('onMouseEnter'),
-  onMouseLeave: action('onMouseLeave'),
-  onMouseUp: action('onMouseUp'),
-});
+  Search16: props => <Search16 className={`${prefix}--btn__icon`} {...props} />,
+};
+
+const props = () => {
+  const iconToUse = iconMap[select('Icon (icon)', icons, 'none')];
+  return {
+    className: 'some-class',
+    disabled: boolean('Disable the launcher button (disabled)', false),
+    passiveModal: boolean('Without footer (passiveModal)', false),
+    danger: boolean('Danger mode (danger)', false),
+    buttonTriggerText: text(
+      'The text in the trigger button (buttonTriggerText)',
+      'Launch Modal'
+    ),
+    renderTriggerButtonIcon: typeof iconToUse === 'function' && iconToUse,
+    triggerButtonIcon: typeof iconToUse !== 'function' && iconToUse,
+    modalLabel: text('The modal label (optional) (modalLabel)', 'Label'),
+    modalHeading: text('The modal heading (modalHeading)', 'Modal'),
+    selectorPrimaryFocus: text(
+      'Primary focus element selector (selectorPrimaryFocus)',
+      '[data-modal-primary-focus]'
+    ),
+    primaryButtonText: text(
+      'The text in the primary button (primaryButtonText)',
+      'Save'
+    ),
+    secondaryButtonText: text(
+      'The text in the secondary button (secondaryButtonText)',
+      'Cancel'
+    ),
+    shouldCloseAfterSubmit: boolean(
+      'Close after submit (shouldCloseAfterSubmit)',
+      true
+    ),
+    onBlur: action('onBlur'),
+    onClick: action('onClick'),
+    onFocus: action('onFocus'),
+    onMouseDown: action('onMouseDown'),
+    onMouseEnter: action('onMouseEnter'),
+    onMouseLeave: action('onMouseLeave'),
+    onMouseUp: action('onMouseUp'),
+  };
+};
 
 storiesOf('ModalWrapper', module)
   .addDecorator(withKnobs)
   .add(
     'transactional/passive modal',
-    withInfo({
-      text: `
-        Transactional modals are used to validate user decisions or to gain secondary confirmation from the user.
-        Passive modal notifications should only appear if there is an action the user needs to address immediately.
-        Passive modal notifications are persistent on screen.
-      `,
-    })(() => (
+    () => (
       <ModalWrapper
         id="transactional-passive-modal"
         handleSubmit={() => {
@@ -88,17 +128,20 @@ storiesOf('ModalWrapper', module)
           tincidunt sodales.
         </p>
       </ModalWrapper>
-    ))
+    ),
+    {
+      info: {
+        text: `
+            Transactional modals are used to validate user decisions or to gain secondary confirmation from the user.
+            Passive modal notifications should only appear if there is an action the user needs to address immediately.
+            Passive modal notifications are persistent on screen.
+          `,
+      },
+    }
   )
   .add(
     'input modal',
-    withInfo({
-      text: `
-        Input modals are used to follow up with previous user input. These modals should include areas
-        for input that the user can interact with, such as forms, dropdowns, selectors, and links. The example
-        below shows a Modal Wrapper component with various input components.
-      `,
-    })(() => (
+    () => (
       <ModalWrapper
         id="input-modal"
         handleSubmit={() => {
@@ -109,8 +152,7 @@ storiesOf('ModalWrapper', module)
         <TextInput
           id="test2"
           placeholder="Hint text here"
-          label="Text Input:"
-          data-modal-primary-focus
+          labelText="Text Input:"
         />
         <br />
         <Select id="select-1" labelText="Select">
@@ -149,5 +191,14 @@ storiesOf('ModalWrapper', module)
           />
         </RadioButtonGroup>
       </ModalWrapper>
-    ))
+    ),
+    {
+      info: {
+        text: `
+            Input modals are used to follow up with previous user input. These modals should include areas
+            for input that the user can interact with, such as forms, dropdowns, selectors, and links. The example
+            below shows a Modal Wrapper component with various input components.
+          `,
+      },
+    }
   );

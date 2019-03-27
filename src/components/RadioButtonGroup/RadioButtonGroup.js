@@ -1,9 +1,22 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import PropTypes from 'prop-types';
 import React from 'react';
+import classNames from 'classnames';
 import RadioButton from '../RadioButton';
 import warning from 'warning';
+import { settings } from 'carbon-components';
+
+const { prefix } = settings;
 
 export default class RadioButtonGroup extends React.Component {
+  state = { selected: this.props.valueSelected || this.props.defaultSelected };
+
   static propTypes = {
     /**
      * Provide a collection of <RadioButton> components to render in the group
@@ -44,12 +57,11 @@ export default class RadioButtonGroup extends React.Component {
 
   static defaultProps = {
     onChange: /* istanbul ignore next */ () => {},
-    className: 'bx--radio-button-group',
   };
 
   static getDerivedStateFromProps({ valueSelected, defaultSelected }, state) {
-    const { prevValueSelected } = state || {};
-    return state && prevValueSelected === valueSelected
+    const { prevValueSelected } = state;
+    return prevValueSelected === valueSelected
       ? null
       : {
           selected: valueSelected || defaultSelected,
@@ -94,9 +106,14 @@ export default class RadioButtonGroup extends React.Component {
   render() {
     const { disabled, className } = this.props;
 
+    const wrapperClasses = classNames(
+      `${prefix}--radio-button-group`,
+      className
+    );
+
     return (
-      <div className="bx--form-item">
-        <div className={className} disabled={disabled}>
+      <div className={`${prefix}--form-item`}>
+        <div className={wrapperClasses} disabled={disabled}>
           {this.getRadioButtons()}
         </div>
       </div>

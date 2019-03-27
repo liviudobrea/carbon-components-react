@@ -1,4 +1,12 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
+import ChevronDown16 from '@carbon/icons-react/lib/chevron--down/16';
 import { iconChevronDown } from 'carbon-icons';
 import {
   Tile,
@@ -9,6 +17,7 @@ import {
   TileBelowTheFoldContent,
 } from '../Tile';
 import { shallow, mount } from 'enzyme';
+import { componentsX } from '../../internal/FeatureFlags';
 
 describe('Tile', () => {
   describe('Renders default tile as expected', () => {
@@ -99,9 +108,11 @@ describe('Tile', () => {
         <div className="child">Test</div>
       </SelectableTile>
     );
+    let label;
 
     beforeEach(() => {
       wrapper.state().selected = false;
+      label = wrapper.find('label');
     });
 
     it('renders children as expected', () => {
@@ -109,7 +120,7 @@ describe('Tile', () => {
     });
 
     it('has the expected classes', () => {
-      expect(wrapper.children().hasClass('bx--tile--selectable')).toEqual(true);
+      expect(label.hasClass('bx--tile--selectable')).toEqual(true);
     });
 
     it('renders extra classes passed in via className', () => {
@@ -118,15 +129,15 @@ describe('Tile', () => {
 
     it('toggles the selectable state on click', () => {
       expect(wrapper.state().selected).toEqual(false);
-      wrapper.simulate('click');
+      label.simulate('click');
       expect(wrapper.state().selected).toEqual(true);
     });
 
     it('toggles the selectable state when using enter or space', () => {
       expect(wrapper.state().selected).toEqual(false);
-      wrapper.simulate('keydown', { which: 32 });
+      label.simulate('keydown', { which: 32 });
       expect(wrapper.state().selected).toEqual(true);
-      wrapper.simulate('keydown', { which: 13 });
+      label.simulate('keydown', { which: 13 });
       expect(wrapper.state().selected).toEqual(false);
     });
 
@@ -207,8 +218,8 @@ describe('Tile', () => {
       // Force the expanded tile to be collapsed.
       wrapper.setState({ expanded: false });
       const collapsedDescription = wrapper
-        .find({ icon: iconChevronDown })
-        .getElements()[0].props.description;
+        .find(!componentsX ? { icon: iconChevronDown } : ChevronDown16)
+        .getElements()[0].props[!componentsX ? 'description' : 'aria-label'];
       expect(collapsedDescription).toEqual(defaultCollapsedIconText);
 
       // click on the item to expand it.
@@ -216,8 +227,8 @@ describe('Tile', () => {
 
       // Validate the description change
       const expandedDescription = wrapper
-        .find({ icon: iconChevronDown })
-        .getElements()[0].props.description;
+        .find(!componentsX ? { icon: iconChevronDown } : ChevronDown16)
+        .getElements()[0].props[!componentsX ? 'description' : 'aria-label'];
       expect(expandedDescription).toEqual(defaultExpandedIconText);
     });
 
@@ -231,8 +242,8 @@ describe('Tile', () => {
       // Force the expanded tile to be collapsed.
       wrapper.setState({ expanded: false });
       const collapsedDescription = wrapper
-        .find({ icon: iconChevronDown })
-        .getElements()[0].props.description;
+        .find(!componentsX ? { icon: iconChevronDown } : ChevronDown16)
+        .getElements()[0].props[!componentsX ? 'description' : 'aria-label'];
       expect(collapsedDescription).toEqual(tileCollapsedIconText);
 
       // click on the item to expand it.
@@ -240,8 +251,8 @@ describe('Tile', () => {
 
       // Validate the description change
       const expandedDescription = wrapper
-        .find({ icon: iconChevronDown })
-        .getElements()[0].props.description;
+        .find(!componentsX ? { icon: iconChevronDown } : ChevronDown16)
+        .getElements()[0].props[!componentsX ? 'description' : 'aria-label'];
       expect(expandedDescription).toEqual(tileExpandedIconText);
     });
 

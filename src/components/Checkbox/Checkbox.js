@@ -1,52 +1,70 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
+import { settings } from 'carbon-components';
 
-const Checkbox = ({
-  className,
-  id,
-  labelText,
-  onChange,
-  indeterminate,
-  hideLabel,
-  wrapperClassName,
-  title = '',
-  ...other
-}) => {
-  let input;
-  const labelClasses = classNames('bx--checkbox-label', className);
-  const innerLabelClasses = classNames({
-    'bx--visually-hidden': hideLabel,
-  });
-  const wrapperClasses = classNames(
-    'bx--form-item',
-    'bx--checkbox-wrapper',
-    wrapperClassName
-  );
+const { prefix } = settings;
 
-  return (
-    <div className={wrapperClasses}>
-      <input
-        {...other}
-        type="checkbox"
-        onChange={evt => {
-          onChange(input.checked, id, evt);
-        }}
-        className="bx--checkbox"
-        id={id}
-        ref={el => {
-          input = el;
-          if (input) {
-            input.indeterminate = indeterminate;
-          }
-        }}
-      />
-      <label htmlFor={id} className={labelClasses} title={title || null}>
-        <span className={innerLabelClasses}>{labelText}</span>
-      </label>
-    </div>
-  );
-};
+const Checkbox = React.forwardRef(
+  (
+    {
+      className,
+      id,
+      labelText,
+      onChange,
+      indeterminate,
+      hideLabel,
+      wrapperClassName,
+      title = '',
+      ...other
+    },
+    ref
+  ) => {
+    const labelClasses = classNames(`${prefix}--checkbox-label`, className);
+    const innerLabelClasses = classNames({
+      [`${prefix}--visually-hidden`]: hideLabel,
+    });
+    const wrapperClasses = classNames(
+      `${prefix}--form-item`,
+      `${prefix}--checkbox-wrapper`,
+      wrapperClassName
+    );
+
+    return (
+      <div className={wrapperClasses}>
+        <input
+          {...other}
+          type="checkbox"
+          onChange={evt => {
+            onChange(evt.target.checked, id, evt);
+          }}
+          className={`${prefix}--checkbox`}
+          id={id}
+          ref={el => {
+            if (el) {
+              el.indeterminate = indeterminate;
+            }
+            if (typeof ref === 'function') {
+              ref(el);
+            } else if (Object(ref) === ref) {
+              ref.current = el;
+            }
+          }}
+        />
+        <label htmlFor={id} className={labelClasses} title={title || null}>
+          <span className={innerLabelClasses}>{labelText}</span>
+        </label>
+      </div>
+    );
+  }
+);
 
 Checkbox.propTypes = {
   /**

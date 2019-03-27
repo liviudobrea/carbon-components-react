@@ -123,6 +123,7 @@ export default class FilterableMultiSelectV2 extends PureComponent {
       isOpen: props.open,
       inputValue: '',
     };
+    this.downshiftRef = React.createRef();
   }
 
   handleOnChange = changes => {

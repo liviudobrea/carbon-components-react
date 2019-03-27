@@ -2,13 +2,13 @@
 
 Want to contribute to this repository? Please read below first:
 
-* [Issues and Bugs](#issues-and-bugs)
-* [Feature Requests](#feature-requests)
-* [Doc Fixes](#doc-fixes)
-* [Submission Guidelines](#submission-guidelines)
-* [Coding Standards](#coding-standards)
-* [Commit Message Guidelines](#commit-message-guidlines)
-* [Testing](#testing)
+- [Issues and Bugs](#issues-and-bugs)
+- [Feature Requests](#feature-requests)
+- [Doc Fixes](#doc-fixes)
+- [Submission Guidelines](#submission-guidelines)
+- [Coding Standards](#coding-standards)
+- [Commit Message Guidelines](#commit-message-guidelines)
+- [Testing](#testing)
 
 ## Issues and Bugs
 
@@ -121,7 +121,12 @@ If you decide to not install a linter addon, or cannot, you can run `yarn lint` 
 
 ## Commit Message Guidelines
 
-We use commit message guidelines based on the [Angular Commit Conventions](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit).
+We use commit message guidelines based on the [Angular Commit Conventions](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits).
+
+Please stick to the following format: `git commit -m "<type>(<scope>): <message>"`
+
+- Replace `<type>` with one of following: feat, fix, docs, style, refactor, perf, test, chore, revert.
+- The `(<scope>)` is optional and could be anything specifying the place of the commit change.
 
 After the commit message has been submitted, it is checked by [`husky`](https://www.npmjs.com/package/husky) and [`validate-commit-msg`](https://www.npmjs.com/package/validate-commit-msg) to ensure it is syntactically correct.
 
@@ -131,32 +136,80 @@ If you add any features to our code, make sure to add tests so that your changes
 
 Test your changes by running our test commands:
 
-* Run linting:
+- Run linting:
 
   ```
   yarn lint
   ```
 
-* Run unit tests:
+- Run unit tests:
 
   ```
   yarn test
   ```
 
-* Run both linting and unit tests:
+- Run both linting and unit tests:
 
   ```
   yarn ci-check
   ```
 
-* Watching unit tests:
+- Watching unit tests:
 
   ```
   yarn test --watch
   ```
 
-* Generate code coverage report (stored in `.gh-pages/coverage` folder):
+- Generate code coverage report (stored in `.gh-pages/coverage` folder):
 
   ```
   yarn test --coverage
   ```
+
+## Storybook
+
+We recommend the use of [React Storybook](https://github.com/storybooks/react-storybook) for developing components.
+
+1. (Optional) Set environment variables:
+
+   - `true` to `CARBON_USE_BREAKING_CHANGES` environment variable to test some of the breaking changes for the next release:
+
+     ```
+     $ export CARBON_USE_BREAKING_CHANGES=true
+     ```
+
+   - `true` to `CARBON_REACT_STORYBOOK_USE_EXTERNAL_CSS` environment variable to use external CSS, making style source link usable in DOM inspector:
+
+     ```
+     $ export CARBON_REACT_STORYBOOK_USE_EXTERNAL_CSS=true
+     ```
+
+   - `true` to `CARBON_REACT_STORYBOOK_USE_STYLE_SOURCEMAP` environment variable to use Sass source map, making style source link point to the original Sass code:
+
+     ```
+     $ export CARBON_REACT_STORYBOOK_USE_STYLE_SOURCEMAP=true
+     ```
+
+   - `true` to `CARBON_USE_EXPERIMENTAL_FEATURES` environment variable to test some of the experimental changes:
+
+     ```
+     $ export CARBON_USE_EXPERIMENTAL_FEATURES=true
+     ```
+
+Caveats:
+
+- `CARBON_REACT_STORYBOOK_USE_EXTERNAL_CSS=true` and `CARBON_REACT_STORYBOOK_USE_STYLE_SOURCEMAP=true` make WebPack builds slightly slower.
+- With `CARBON_REACT_STORYBOOK_USE_STYLE_SOURCEMAP=true`, the source map (hitting style source link in DOM inspector) sometimes leads you to a mix-in, instead of a style rule calling the mix-in, which may get you lost.
+
+2. Start the server:
+
+   ```
+   $ yarn storybook
+   ```
+
+3. Open browser to `http://localhost:9000/`.
+
+4. Develop components in their respective folders (`/components` or `/internal`).
+
+5. Write stories for your components next to the components themselves, for
+   example `Checkbox.js` would have `Checkbox-story.js` in the same folder.

@@ -1,9 +1,19 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { iconCaretUp, iconCaretDown } from 'carbon-icons';
+import CaretDownGlyph from '@carbon/icons-react/lib/caret--down/index';
+import CaretUpGlyph from '@carbon/icons-react/lib/caret--up/index';
 import Icon from '../Icon';
 import NumberInput from '../NumberInput';
 import NumberInputSkeleton from '../NumberInput/NumberInput.Skeleton';
+import { componentsX } from '../../internal/FeatureFlags';
 
 describe('NumberInput', () => {
   describe('should render as expected', () => {
@@ -25,14 +35,22 @@ describe('NumberInput', () => {
           className="extra-class"
           invalidText="invalid text"
           helperText="testHelper"
+          translateWithId={
+            /*
+              Simulates a condition where up/down button's hover over text matches `iconDescription` in `v10`,
+              which is, when the translation for up/down button are not there
+            */
+            () => undefined
+          }
         />
       );
 
+      const iconTypes = !componentsX ? [Icon] : [CaretDownGlyph, CaretUpGlyph];
       label = wrapper.find('label');
       numberInput = wrapper.find('input');
       container = wrapper.find('.bx--number');
       formItem = wrapper.find('.bx--form-item');
-      icons = wrapper.find(Icon);
+      icons = wrapper.findWhere(n => iconTypes.includes(n.type()));
       helper = wrapper.find('.bx--form__helper-text');
     });
 
@@ -42,7 +60,9 @@ describe('NumberInput', () => {
       });
 
       it('has the expected classes', () => {
-        expect(container.hasClass('bx--number')).toEqual(true);
+        expect(container.hasClass('bx--number bx--number--helpertext')).toEqual(
+          true
+        );
       });
 
       it('has renders with form-item wrapper', () => {
@@ -92,9 +112,20 @@ describe('NumberInput', () => {
       });
 
       it('should specify light number input as expected', () => {
-        expect(wrapper.props().light).toEqual(false);
+        expect(wrapper.find('NumberInput').props().light).toEqual(false);
         wrapper.setProps({ light: true });
-        expect(wrapper.props().light).toEqual(true);
+        expect(wrapper.find('NumberInput').props().light).toEqual(true);
+      });
+
+      it('should hide label as expected', () => {
+        expect(numberInput.prop('min')).toEqual(0);
+        wrapper.setProps({ hideLabel: true });
+        expect(wrapper.find('label').hasClass('bx--visually-hidden')).toEqual(
+          true
+        );
+        expect(
+          wrapper.find('.bx--number').hasClass('bx--number--nolabel')
+        ).toEqual(true);
       });
 
       describe('initial rendering', () => {
@@ -136,24 +167,54 @@ describe('NumberInput', () => {
         });
 
         it('should set invalidText when value is empty string', () => {
-          wrapper.setProps({ value: '' });
+          // Enzyme doesn't seem to allow setState() in a forwardRef-wrapped class component
+          wrapper
+            .find('NumberInput')
+            .instance()
+            .setState({ value: '' });
+          wrapper.update();
           const invalidText = wrapper.find('.bx--form-requirement');
           expect(invalidText.length).toEqual(1);
+
           expect(invalidText.text()).toEqual('invalid text');
+        });
+
+        it('allow empty string value', () => {
+          // Enzyme doesn't seem to allow setState() in a forwardRef-wrapped class component
+          wrapper
+            .find('NumberInput')
+            .instance()
+            .setState({ value: '' });
+          wrapper.update();
+          wrapper.setProps({ allowEmpty: true });
+          const invalidText = wrapper.find('.bx--form-requirement');
+          expect(invalidText.length).toEqual(0);
         });
 
         it('should change the value upon change in props', () => {
           wrapper.setProps({ value: 1 });
-          wrapper.setState({ value: 1 });
+          // Enzyme doesn't seem to allow setState() in a forwardRef-wrapped class component
+          wrapper
+            .find('NumberInput')
+            .instance()
+            .setState({ value: 1 });
+          wrapper.update();
           wrapper.setProps({ value: 2 });
-          expect(wrapper.state().value).toEqual(2);
+          // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+          expect(wrapper.find('NumberInput').instance().state.value).toEqual(2);
         });
 
         it('should avoid change the value upon setting props, unless there the value actually changes', () => {
           wrapper.setProps({ value: 1 });
-          wrapper.setState({ value: 2 });
+          // Enzyme doesn't seem to allow setState() in a forwardRef-wrapped class component
+          wrapper
+            .find('NumberInput')
+            .instance()
+            .setState({ value: 2 });
+          wrapper.update();
           wrapper.setProps({ value: 1 });
-          expect(wrapper.state().value).toEqual(2);
+          // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+          expect(wrapper.find('NumberInput').instance().state.value).toEqual(2);
         });
       });
     });
@@ -164,12 +225,19 @@ describe('NumberInput', () => {
       });
 
       it('has the expected default iconDescription', () => {
-        expect(wrapper.prop('iconDescription')).toEqual('choose a number');
+        expect(wrapper.find('NumberInput').prop('iconDescription')).toEqual(
+          'choose a number'
+        );
       });
 
       it('should use correct icons', () => {
-        expect(icons.at(0).prop('icon')).toEqual(iconCaretUp);
-        expect(icons.at(1).prop('icon')).toEqual(iconCaretDown);
+        if (!componentsX) {
+          expect(icons.at(0).prop('icon')).toEqual(iconCaretUp);
+          expect(icons.at(1).prop('icon')).toEqual(iconCaretDown);
+        } else {
+          expect(icons.at(0).type()).toBe(CaretUpGlyph);
+          expect(icons.at(1).type()).toBe(CaretDownGlyph);
+        }
       });
 
       it('adds new iconDescription when passed via props', () => {
@@ -178,9 +246,15 @@ describe('NumberInput', () => {
       });
 
       it('should have iconDescription match Icon component description prop', () => {
-        const iconUpText = wrapper.find('.up-icon title').text();
-        const iconDownText = wrapper.find('.down-icon title').text();
-        const iconDescription = wrapper.prop('iconDescription');
+        const iconUpText = !componentsX
+          ? wrapper.find('.up-icon title').text()
+          : wrapper.find('button.up-icon').prop('title');
+        const iconDownText = !componentsX
+          ? wrapper.find('.down-icon title').text()
+          : wrapper.find('button.down-icon').prop('title');
+        const iconDescription = wrapper
+          .find('NumberInput')
+          .prop('iconDescription');
 
         const matches =
           iconDescription === iconUpText && iconDescription === iconDownText;
@@ -231,7 +305,7 @@ describe('NumberInput', () => {
       const onClick = jest.fn();
       const onChange = jest.fn();
 
-      const wrapper = shallow(
+      const wrapper = mount(
         <NumberInput id="test" onClick={onClick} onChange={onChange} disabled />
       );
 
@@ -283,8 +357,12 @@ describe('NumberInput', () => {
         );
 
         input = wrapper.find('input');
-        upArrow = wrapper.find('Icon.up-icon').closest('button');
-        downArrow = wrapper.find('Icon.down-icon').closest('button');
+        upArrow = wrapper
+          .find(!componentsX ? 'Icon.up-icon' : CaretUpGlyph)
+          .closest('button');
+        downArrow = wrapper
+          .find(!componentsX ? 'Icon.down-icon' : CaretDownGlyph)
+          .closest('button');
       });
 
       it('should invoke onClick when numberInput is clicked', () => {
@@ -301,14 +379,16 @@ describe('NumberInput', () => {
       it('should only increase the value on up arrow click if value is less than max', () => {
         wrapper.setProps({ value: 100 });
         upArrow.simulate('click');
-        expect(wrapper.state().value).toEqual(100);
+        // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+        expect(wrapper.find('NumberInput').instance().state.value).toEqual(100);
         expect(onClick).not.toBeCalled();
       });
 
       it('should only decrease the value on down arrow click if value is greater than min', () => {
         wrapper.setProps({ value: 0 });
         downArrow.simulate('click');
-        expect(wrapper.state().value).toEqual(0);
+        // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+        expect(wrapper.find('NumberInput').instance().state.value).toEqual(0);
         expect(onClick).not.toBeCalled();
       });
 
@@ -317,9 +397,11 @@ describe('NumberInput', () => {
           step: 10,
           value: 0,
         });
-        expect(wrapper.state().value).toEqual(0);
+        // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+        expect(wrapper.find('NumberInput').instance().state.value).toEqual(0);
         upArrow.simulate('click');
-        expect(wrapper.state().value).toEqual(10);
+        // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+        expect(wrapper.find('NumberInput').instance().state.value).toEqual(10);
       });
 
       it('should decrease by the value of step', () => {
@@ -327,9 +409,11 @@ describe('NumberInput', () => {
           step: 10,
           value: 100,
         });
-        expect(wrapper.state().value).toEqual(100);
+        // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+        expect(wrapper.find('NumberInput').instance().state.value).toEqual(100);
         downArrow.simulate('click');
-        expect(wrapper.state().value).toEqual(90);
+        // Enzyme doesn't seem to allow state() in a forwardRef-wrapped class component
+        expect(wrapper.find('NumberInput').instance().state.value).toEqual(90);
       });
 
       it('should not invoke onClick when down arrow is clicked and value is 0', () => {

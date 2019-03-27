@@ -1,3 +1,10 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import { mount } from 'enzyme';
 import ListBox from '../';
@@ -43,5 +50,15 @@ describe('ListBox', () => {
         .prop('className')
         .includes(mockProps.className)
     ).toBe(true);
+  });
+
+  it('should pass down innerTabIndex prop to the inner divs tabIndex', () => {
+    mockProps.innerTabIndex = -1;
+    const wrapper = mount(<ListBox {...mockProps} />);
+    expect(wrapper.children().prop('tabIndex')).toBe(-1);
+  });
+  it('should default the inner divs tabIndex to 0 if no innerTabIndex prop', () => {
+    const wrapper = mount(<ListBox {...mockProps} />);
+    expect(wrapper.children().prop('tabIndex')).toBe(0);
   });
 });

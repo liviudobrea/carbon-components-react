@@ -1,25 +1,41 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
+import { settings } from 'carbon-components';
 
-const DataTableSkeleton = ({ rowCount, zebra, compact, ...other }) => {
+const { prefix } = settings;
+
+const DataTableSkeleton = ({
+  rowCount,
+  columnCount,
+  zebra,
+  compact,
+  headers,
+  ...other
+}) => {
   const dataTableSkeletonClasses = classNames({
-    'bx--skeleton': true,
-    'bx--data-table-v2': true,
-    'bx--data-table-v2--zebra': zebra,
-    'bx--data-table-v2--compact': compact,
+    [`${prefix}--skeleton`]: true,
+    [`${prefix}--data-table-v2`]: true,
+    [`${prefix}--data-table-v2--zebra`]: zebra,
+    [`${prefix}--data-table-v2--compact`]: compact,
   });
 
-  const rows = [];
   const rowRepeat = rowCount - 1;
-  for (var i = 0; i < rowRepeat; i++) {
-    rows.push(
+  const rows = Array(rowRepeat);
+  const columnsArray = Array.from({ length: columnCount }, (_, index) => index);
+  for (let i = 0; i < rowRepeat; i++) {
+    rows[i] = (
       <tr key={i}>
-        <td />
-        <td />
-        <td />
-        <td />
-        <td />
+        {columnsArray.map(j => (
+          <td key={j} />
+        ))}
       </tr>
     );
   }
@@ -28,30 +44,18 @@ const DataTableSkeleton = ({ rowCount, zebra, compact, ...other }) => {
     <table className={dataTableSkeletonClasses} {...other}>
       <thead>
         <tr>
-          <th />
-          <th />
-          <th />
-          <th />
-          <th />
+          {columnsArray.map(i => (
+            <th key={i}>{headers[i]}</th>
+          ))}
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>
-            <span />
-          </td>
-          <td>
-            <span />
-          </td>
-          <td>
-            <span />
-          </td>
-          <td>
-            <span />
-          </td>
-          <td>
-            <span />
-          </td>
+          {columnsArray.map(i => (
+            <td key={i}>
+              <span />
+            </td>
+          ))}
         </tr>
         {rows}
       </tbody>
@@ -66,6 +70,11 @@ DataTableSkeleton.propTypes = {
   rowCount: PropTypes.number,
 
   /**
+   * Specify the number of columns that you want to render in the skeleton state
+   */
+  columnCount: PropTypes.number,
+
+  /**
    * Optionally specify whether you want the DataTable to be zebra striped
    */
   zebra: PropTypes.bool,
@@ -75,12 +84,19 @@ DataTableSkeleton.propTypes = {
    * compact DataTable
    */
   compact: PropTypes.bool,
+
+  /**
+   * Optionally specify the displayed headers
+   */
+  headers: PropTypes.array,
 };
 
 DataTableSkeleton.defaultProps = {
   rowCount: 5,
+  columnCount: 5,
   zebra: false,
   compact: false,
+  headers: [],
 };
 
 export default DataTableSkeleton;

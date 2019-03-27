@@ -1,10 +1,19 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
+import ChevronDownGlyph from '@carbon/icons-react/lib/chevron--down/index';
 import { iconCaretDown } from 'carbon-icons';
 import Icon from '../Icon';
 import Tabs from '../Tabs';
 import Tab from '../Tab';
 import TabsSkeleton from '../Tabs/Tabs.Skeleton';
 import { shallow, mount } from 'enzyme';
+import { componentsX } from '../../internal/FeatureFlags';
 
 describe('Tabs', () => {
   describe('renders as expected', () => {
@@ -57,7 +66,11 @@ describe('Tabs', () => {
       });
 
       it('renders <Icon>', () => {
-        expect(trigger.find(Icon).props().icon).toEqual(iconCaretDown);
+        if (!componentsX) {
+          expect(trigger.find(Icon).props().icon).toEqual(iconCaretDown);
+        } else {
+          expect(trigger.find(ChevronDownGlyph).length).toBe(1);
+        }
       });
     });
 
@@ -96,23 +109,25 @@ describe('Tabs', () => {
       </Tabs>
     );
 
-    it('renders expected className', () => {
-      const tabContentClass = 'tab-content';
-      expect(
-        wrapper
-          .find('.tab-content')
-          .first()
-          .hasClass(tabContentClass)
-      ).toBe(true);
+    it('renders content children as expected', () => {
+      expect(wrapper.find('TabContent').length).toEqual(2);
     });
 
-    it('renders content children as expected', () => {
-      expect(wrapper.find('.tab-content').length).toEqual(2);
+    it('allows for custom classNames on <TabContent>', () => {
+      const customTabContentClassWrapper = shallow(
+        <Tabs tabContentClassName="tab-content">
+          <Tab label="firstTab">content1</Tab>
+          <Tab label="lastTab">content2</Tab>
+        </Tabs>
+      );
+      expect(customTabContentClassWrapper.find('.tab-content').length).toEqual(
+        2
+      );
     });
 
     it('renders hidden props with boolean value', () => {
       const hiddenProp = wrapper
-        .find('.tab-content')
+        .find('TabContent')
         .first()
         .props().hidden;
       expect(typeof hiddenProp).toBe('boolean');
@@ -120,7 +135,7 @@ describe('Tabs', () => {
 
     it('renders selected props with boolean value', () => {
       const selectedProp = wrapper
-        .find('.tab-content')
+        .find('TabContent')
         .first()
         .props().hidden;
       expect(typeof selectedProp).toBe('boolean');

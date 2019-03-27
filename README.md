@@ -1,16 +1,11 @@
-# Carbon Components React
+# carbon-components-react
 
-[![Build Status](https://travis-ci.org/IBM/carbon-components-react.svg?branch=master)](https://travis-ci.org/IBM/carbon-components-react)
-[![All Contributors](https://img.shields.io/badge/all_contributors-62-orange.svg?style=flat-square)](#contributors)
-[![Greenkeeper badge](https://badges.greenkeeper.io/IBM/carbon-components-react.svg)](https://greenkeeper.io/)
+[![Carbon Components is released under the Apache-2.0 license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+[![CircleCI](https://circleci.com/gh/IBM/carbon-components-react.svg?style=shield)](https://circleci.com/gh/IBM/carbon-components-react)
+[![All Contributors](https://img.shields.io/badge/all_contributors-64-orange.svg?style=flat-square)](#contributors)
+[![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./.github/CONTRIBUTING.md)
 
-> A collection of [Carbon Components](https://github.com/IBM/carbon-components) implemented using [React](https://facebook.github.io/react/).
-
-## Usage
-
-### List of Available Components
-
-View available React Components [here](http://react.carbondesignsystem.com). Usage information is available when you click the blue **?** icon in the top right corner of the selected component.
+> A collection of [Carbon Components](https://github.com/IBM/carbon-components) implemented using [React](https://reactjs.org/).
 
 ### Getting Started
 
@@ -32,40 +27,40 @@ yarn add carbon-components-react carbon-components carbon-icons
 
 3. For older browsers (e.g. IE11), polyfills listed in [`carbon-components-react/.storybook/polyfills.js` file](./.storybook/polyfills.js) is required.
 
-If you just want to try out `carbon-components-react`, you can also use [Codesandbox](https://codesandbox.io).
+If you just want to try out `carbon-components-react`, you can also use [CodeSandbox](https://codesandbox.io/s/github/IBM/carbon-components-react/tree/master/examples/codesandbox).
 
-[![Edit carbon-components-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/x2mjypo6pp)
+[![Edit carbon-components-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/IBM/carbon-components-react/tree/master/examples/codesandbox)
 
-## Development
+## Usage
 
-Please refer to the [Contribution Guidelines](./.github/CONTRIBUTING.md) before starting any work.
+### List of Available Components
 
-### Using the server
+View available React Components [here](http://react.carbondesignsystem.com). You can see usage information in several ways:
 
-We recommend the use of [React Storybook](https://github.com/storybooks/react-storybook) for developing components.
+1. Clicking the blue **Show Info** icon in the top right corner of the selected component. You can see the list of available React props
+2. Clicking the **STORY** tab at the bottom. This tab contains the code that shows how the component is being used
+3. Clicking the **KNOBS** tab at the bottom and changing values there. Most knobs are shown as something like `Button kind (kind)`, where `kind` is the name of React prop
+4. Clicking the **ACTION LOGGER** tab at the bottom and interacting with the selected component. You may see something like `onClick` which typically indicates that the event handler (React prop) with the same name is called. You can also expand the twistie to see the details of the event
+5. Clicking the **README** tab at the bottom. You can see some more document for some components
 
-1. Start the server:
+# :books: Documentation
 
-   ```
-   $ yarn storybook
-   ```
-
-2. Open browser to `http://localhost:9000/`.
-
-3. Develop components in their respective folders (`/components` or `/internal`).
-
-4. Write stories for your components in `/.storybook`.
+- See our documentation site [here](http://carbondesignsystem.com/getting-started/developers) for full how-to docs and guidelines
+- [Contributing](/.github/CONTRIBUTING.md): Guidelines for making contributions to this repo
+- [🏃‍♀️ Migration Guides](./docs/migration)
+  - [v6 to v7](./docs/migration/migrate-to-7.x.md)
 
 ## Contributing
 
 Please check out our [Contribution Guidelines](./.github/CONTRIBUTING.md) for detailed information on how you can lend a hand.
+
+To update the `Contributors` section, follow [these instructions](https://github.com/jfmengels/all-contributors-cli#addupdate-contributors)
 
 ## Contributors
 
 Thanks goes to these wonderful people:
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-
 <!-- prettier-ignore -->
 | [<img src="https://avatars3.githubusercontent.com/u/4185382?v=4" width="100px;"/><br /><sub><b>Brian Han</b></sub>](https://github.com/hellobrian)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=hellobrian "Code") | [<img src="https://avatars2.githubusercontent.com/u/1266014?v=4" width="100px;"/><br /><sub><b>Chris Dhanaraj</b></sub>](http://twitter.com/chrisdhanaraj)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=chrisdhanaraj "Code") | [<img src="https://avatars0.githubusercontent.com/u/181819?v=4" width="100px;"/><br /><sub><b>Nick Sandonato</b></sub>](https://github.com/nsand)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=nsand "Code") | [<img src="https://avatars1.githubusercontent.com/u/11928039?v=4" width="100px;"/><br /><sub><b>TJ Egan</b></sub>](http://tw15egan.github.io/portfolio)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=tw15egan "Code") | [<img src="https://avatars0.githubusercontent.com/u/5447411?v=4" width="100px;"/><br /><sub><b>Mari Johannessen</b></sub>](http://www.marijohannessen.com)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=marijohannessen "Code") | [<img src="https://avatars1.githubusercontent.com/u/8836958?v=4" width="100px;"/><br /><sub><b>Sam Doyle</b></sub>](https://github.com/sam1463)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=sam1463 "Code") | [<img src="https://avatars0.githubusercontent.com/u/6420214?v=4" width="100px;"/><br /><sub><b>alex weidner</b></sub>](https://github.com/shimmerjs)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=shimmerjs "Code") |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -76,6 +71,7 @@ Thanks goes to these wonderful people:
 | [<img src="https://avatars0.githubusercontent.com/u/14316696?v=4" width="100px;"/><br /><sub><b>Dogukan</b></sub>](https://github.com/ereneld)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=ereneld "Code") | [<img src="https://avatars2.githubusercontent.com/u/13935994?v=4" width="100px;"/><br /><sub><b>Erika Dsouza</b></sub>](https://github.com/ehdsouza)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=ehdsouza "Code") | [<img src="https://avatars2.githubusercontent.com/u/4943036?v=4" width="100px;"/><br /><sub><b>Jeroen Schaftenaar</b></sub>](https://github.com/jschaftenaar)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=jschaftenaar "Code") | [<img src="https://avatars1.githubusercontent.com/u/16617646?v=4" width="100px;"/><br /><sub><b>Joseph Meis</b></sub>](http://bluemix.net)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=jmeis "Code") | [<img src="https://avatars2.githubusercontent.com/u/11449728?v=4" width="100px;"/><br /><sub><b>Paul Sachs</b></sub>](https://github.com/psachs21)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=psachs21 "Code") | [<img src="https://avatars2.githubusercontent.com/u/17710824?v=4" width="100px;"/><br /><sub><b>Ryan Mackey</b></sub>](https://github.com/ryanomackey)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=ryanomackey "Code") | [<img src="https://avatars2.githubusercontent.com/u/4289301?v=4" width="100px;"/><br /><sub><b>Toni</b></sub>](https://github.com/tonitagd)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=tonitagd "Code") |
 | [<img src="https://avatars3.githubusercontent.com/u/29720673?v=4" width="100px;"/><br /><sub><b>shyfruan</b></sub>](https://github.com/shyfruan)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=shyfruan "Code") | [<img src="https://avatars1.githubusercontent.com/u/7243419?s=400&v=4" width="100px;"/><br /><sub><b>Joseph Gordon</b></sub>](https://github.com/JMGordon)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=JMGordon "Code") | [<img src="https://avatars3.githubusercontent.com/u/7374889?s=400&v=4" width="100px;"/><br /><sub><b>Logan McCaul</b></sub>](https://github.com/loganmccaul)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=loganmccaul "Code") | [<img src="https://avatars2.githubusercontent.com/u/14233261?s=400&v=4" width="100px;"/><br /><sub><b>Matt Chapman</b></sub>](https://github.com/asfordmatt)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=asfordmatt "Code") | [<img src="https://avatars1.githubusercontent.com/u/6663002?s=400&v=4" width="100px;"/><br /><sub><b>Scott Dickerson</b></sub>](https://github.com/scottdickerson)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=scottdickerson "Code") | [<img src="https://avatars3.githubusercontent.com/u/32717?s=400&v=4" width="100px;"/><br /><sub><b>Darío Hereñú</b></sub>](https://github.com/kant)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=kant "Code") | [<img src="https://avatars3.githubusercontent.com/u/1449523?s=400&v=4" width="100px;"/><br /><sub><b>James Zhang</b></sub>](https://github.com/jzhang300)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=jzhang300 "Code") |
 | [<img src="https://avatars0.githubusercontent.com/u/6776917?s=400&v=4" width="100px;"/><br /><sub><b>Simone Riccardelli</b></sub>](https://github.com/michead)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=michead "Code") | [<img src="https://avatars2.githubusercontent.com/u/7711697?s=400&v=4" width="100px;"/><br /><sub><b>Tom</b></sub>](https://github.com/Tom-Danger-Bryant)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=Tom-Danger-Bryant "Code") | [<img src="https://avatars2.githubusercontent.com/u/2263351?s=400&v=4" width="100px;"/><br /><sub><b>Zeus Courtois</b></sub>](https://github.com/zeusorion)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=zeusorion "Code") | [<img src="https://avatars1.githubusercontent.com/u/867941?v=4" width="100px;"/><br /><sub><b>Andrew Daniel</b></sub>](http://www.andrewdaniel.co.uk)<br />[🐛](https://github.com/IBM/carbon-components-react/issues?q=author%3Aajdaniel "Bug reports") [💻](https://github.com/IBM/carbon-components-react/commits?author=ajdaniel "Code") | [<img src="https://avatars1.githubusercontent.com/u/36265276?v=4" width="100px;"/><br /><sub><b>Andy</b></sub>](https://github.com/AndySeymour2904)<br />[🐛](https://github.com/IBM/carbon-components-react/issues?q=author%3AAndySeymour2904 "Bug reports") [💻](https://github.com/IBM/carbon-components-react/commits?author=AndySeymour2904 "Code") | [<img src="https://avatars3.githubusercontent.com/u/7650400?v=4" width="100px;"/><br /><sub><b>Nicholas Lee</b></sub>](https://github.com/nicholaslee119)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=nicholaslee119 "Code") | [<img src="https://avatars1.githubusercontent.com/u/6370760?v=4" width="100px;"/><br /><sub><b>David Menendez</b></sub>](http://davidmenendez.net)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=davidmenendez "Code") |
-| [<img src="https://avatars0.githubusercontent.com/u/14758158?v=4" width="100px;"/><br /><sub><b>Prashant Farkya</b></sub>](https://github.com/pfarkya)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=pfarkya "Code") | [<img src="https://avatars1.githubusercontent.com/u/4045950?v=4" width="100px;"/><br /><sub><b>Tibor Cz</b></sub>](https://neonwarp.github.io)<br />[📖](https://github.com/IBM/carbon-components-react/commits?author=neonwarp "Documentation") | [<img src="https://avatars3.githubusercontent.com/u/10108576?v=4" width="100px;"/><br /><sub><b>Xixiang Chen</b></sub>](https://github.com/nelsonchen90)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=nelsonchen90 "Code") | [<img src="https://avatars1.githubusercontent.com/u/9932290?v=4" width="100px;"/><br /><sub><b>s100</b></sub>](https://github.com/s100)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=s100 "Code") | [<img src="https://avatars2.githubusercontent.com/u/17937450?v=4" width="100px;"/><br /><sub><b>Becca Ellsworth</b></sub>](https://github.com/bellsworth13)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=bellsworth13 "Code") | [<img src="https://avatars2.githubusercontent.com/u/664044?v=4" width="100px;"/><br /><sub><b>Zack Grossbart</b></sub>](http://www.zackgrossbart.com/)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=zgrossbart "Code") |
+| [<img src="https://avatars0.githubusercontent.com/u/14758158?v=4" width="100px;"/><br /><sub><b>Prashant Farkya</b></sub>](https://github.com/pfarkya)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=pfarkya "Code") | [<img src="https://avatars1.githubusercontent.com/u/4045950?v=4" width="100px;"/><br /><sub><b>Tibor Cz</b></sub>](https://neonwarp.github.io)<br />[📖](https://github.com/IBM/carbon-components-react/commits?author=neonwarp "Documentation") | [<img src="https://avatars3.githubusercontent.com/u/10108576?v=4" width="100px;"/><br /><sub><b>Xixiang Chen</b></sub>](https://github.com/nelsonchen90)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=nelsonchen90 "Code") | [<img src="https://avatars1.githubusercontent.com/u/9932290?v=4" width="100px;"/><br /><sub><b>s100</b></sub>](https://github.com/s100)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=s100 "Code") | [<img src="https://avatars2.githubusercontent.com/u/17937450?v=4" width="100px;"/><br /><sub><b>Becca Ellsworth</b></sub>](https://github.com/bellsworth13)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=bellsworth13 "Code") | [<img src="https://avatars2.githubusercontent.com/u/664044?v=4" width="100px;"/><br /><sub><b>Zack Grossbart</b></sub>](http://www.zackgrossbart.com/)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=zgrossbart "Code") | [<img src="https://avatars0.githubusercontent.com/u/6926228?v=4" width="100px;"/><br /><sub><b>Yohanna Gadelrab</b></sub>](https://github.com/Yohanna)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=Yohanna "Code") [🐛](https://github.com/IBM/carbon-components-react/issues?q=author%3AYohanna "Bug reports") [⚠️](https://github.com/IBM/carbon-components-react/commits?author=Yohanna "Tests") [📖](https://github.com/IBM/carbon-components-react/commits?author=Yohanna "Documentation") |
+| [<img src="https://avatars3.githubusercontent.com/u/890?v=4" width="100px;"/><br /><sub><b>Carlos Eduardo Monti</b></sub>](http://www.gfxnstuff.com.ar)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=slaytanic "Code") [📖](https://github.com/IBM/carbon-components-react/commits?author=slaytanic "Documentation") | [<img src="https://avatars0.githubusercontent.com/u/36549917?s=460&v=4" width="100px;"/><br /><sub><b>Thomas Brown</b></sub>](https://www.tombrowndev.co.uk)<br />[💻](https://github.com/IBM/carbon-components-react/commits?author=tombrowndev "Code") |
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->

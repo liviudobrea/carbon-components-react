@@ -1,9 +1,19 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import { iconSearch } from 'carbon-icons';
+import Search16 from '@carbon/icons-react/lib/search/16';
+import Close20 from '@carbon/icons-react/lib/close/20';
 import Icon from '../Icon';
 import Search from '../Search';
 import SearchSkeleton from '../Search/Search.Skeleton';
 import { mount, shallow } from 'enzyme';
+import { componentsX } from '../../internal/FeatureFlags';
 
 describe('Search', () => {
   describe('renders as expected', () => {
@@ -104,13 +114,18 @@ describe('Search', () => {
 
       describe('icons', () => {
         it('renders "search" icon', () => {
-          const icons = wrapper.find(Icon);
-          expect(icons.at(0).props().icon).toEqual(iconSearch);
+          const icons = wrapper.find(!componentsX ? Icon : Search16);
+          if (!componentsX) {
+            expect(icons.at(0).props().icon).toEqual(iconSearch);
+          } else {
+            expect(icons.length).toBe(1);
+          }
         });
 
         it('renders two Icons', () => {
           wrapper.setProps({ small: false });
-          const icons = wrapper.find(Icon);
+          const iconTypes = !componentsX ? [Icon] : [Search16, Close20];
+          const icons = wrapper.findWhere(n => iconTypes.includes(n.type()));
           expect(icons.length).toEqual(2);
         });
       });
@@ -130,8 +145,12 @@ describe('Search', () => {
       const smallContainer = small.find('[role="search"]');
 
       it('renders correct search icon', () => {
-        const icons = small.find(Icon);
-        expect(icons.at(0).props().icon).toEqual(iconSearch);
+        const icons = small.find(!componentsX ? Icon : Search16);
+        if (!componentsX) {
+          expect(icons.at(0).props().icon).toEqual(iconSearch);
+        } else {
+          expect(icons.length).toBe(1);
+        }
       });
 
       it('should have the expected small class', () => {
@@ -143,8 +162,9 @@ describe('Search', () => {
         expect(btn.length).toEqual(1);
       });
 
-      it('renders one Icon', () => {
-        const icons = small.find(Icon);
+      it('renders two Icons', () => {
+        const iconTypes = !componentsX ? [Icon] : [Search16, Close20];
+        const icons = wrapper.findWhere(n => iconTypes.includes(n.type()));
         expect(icons.length).toEqual(2);
       });
     });
@@ -190,7 +210,7 @@ describe('SearchSkeleton', () => {
 
     it('Has the expected classes', () => {
       expect(wrapper.hasClass('bx--skeleton')).toEqual(true);
-      expect(wrapper.hasClass('bx--search--lg')).toEqual(true);
+      expect(wrapper.hasClass('bx--search--xl')).toEqual(true);
     });
   });
 });

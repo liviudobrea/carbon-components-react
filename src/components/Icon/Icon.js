@@ -1,3 +1,10 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import invariant from 'invariant';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -81,6 +88,10 @@ export function svgShapes(svgData) {
         return data.map((path, index) => (
           <path d={path.d} key={`key${index}`} />
         ));
+      } else if (svgProp === 'polygons') {
+        return data.map((polygon, index) => (
+          <polygon points={polygon.points} key={`key${index}`} />
+        ));
       }
 
       return '';
@@ -103,6 +114,7 @@ export function isPrefixed(name) {
 
 const Icon = ({
   className,
+  iconTitle,
   description,
   fill,
   fillRule,
@@ -133,7 +145,9 @@ const Icon = ({
 
   return (
     <svg {...props} aria-label={description} alt={description}>
-      <title>{description}</title>
+      <title>
+        {typeof iconTitle === 'undefined' ? description : iconTitle}
+      </title>
       {svgContent}
     </svg>
   );
@@ -144,6 +158,11 @@ Icon.propTypes = {
    * The CSS class name.
    */
   className: PropTypes.string,
+
+  /**
+   * The icon title.
+   */
+  iconTitle: PropTypes.string,
 
   /**
    * The icon description.

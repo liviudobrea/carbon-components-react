@@ -1,3 +1,10 @@
+/**
+ * Copyright IBM Corp. 2016, 2018
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import DataTable, {
   Table,
@@ -16,7 +23,13 @@ export default () => (
   <DataTable
     rows={initialRows}
     headers={headers}
-    render={({ rows, headers, getHeaderProps, getSelectionProps }) => (
+    render={({
+      rows,
+      headers,
+      getHeaderProps,
+      getRowProps,
+      getSelectionProps,
+    }) => (
       <TableContainer title="DataTable">
         <Table>
           <TableHead>
@@ -31,7 +44,7 @@ export default () => (
           </TableHead>
           <TableBody>
             {rows.map(row => (
-              <TableRow key={row.id}>
+              <TableRow {...getRowProps({ row })}>
                 <TableSelectRow {...getSelectionProps({ row })} />
                 {row.cells.map(cell => (
                   <TableCell key={cell.id}>{cell.value}</TableCell>
